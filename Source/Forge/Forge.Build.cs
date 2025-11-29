@@ -9,7 +9,7 @@ public class Forge : ModuleRules
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput",
-			"NavigationSystem", "UMG", "AIModule", "Niagara", "GameplayAbilities", "GameplayTags", "GameplayTasks"});
+			"NavigationSystem", "UMG", "AIModule", "Niagara", "GameplayAbilities", "GameplayTags", "GameplayTasks", "Slate", "SlateCore" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
