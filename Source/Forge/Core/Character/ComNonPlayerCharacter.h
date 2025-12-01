@@ -30,4 +30,12 @@ protected:
 	TObjectPtr<UComCombatAttributeSet> CombatAttributeSet;
 	UPROPERTY(EditDefaultsOnly, Category="GAS")
 	TSubclassOf<UGameplayEffect> InitialGameplayEffect;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="GAS")
+	TObjectPtr<UAnimMontage> DeathMontage = nullptr;
+	
+	UFUNCTION()
+	void HandleHealthChanged(AActor* EffectInstigator, float OldValue, float NewValue);
+
+	void Die();
 };

@@ -3,6 +3,7 @@
 #include "AaiNonPlayerController.h"
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "GameFramework/Character.h"
 
 EBTNodeResult::Type UAaiAttackTask::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
@@ -11,10 +12,20 @@ EBTNodeResult::Type UAaiAttackTask::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 
 	Controller->StopMovement();
 	
-	APawn* Pawn { OwnerComp.GetAIOwner()->GetPawn() };
-
-	// Attack placeholder
-	DrawDebugString(GetWorld(),Pawn->GetActorLocation() + FVector(0,0,120),"Attack", nullptr, FColor::Red, 1.0f);
+	ACharacter* Character { OwnerComp.GetAIOwner()->GetCharacter() };
+	if (!Character)
+		return EBTNodeResult::Failed;
+	
+	if (UAnimInstance* AnimInstance = Character->GetMesh()->GetAnimInstance())
+	{        
+		if (AttackAnim)
+			AnimInstance->Montage_Play(AttackAnim);
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("UAaiAttackTask: AttackAnim has not been set"));
+			return EBTNodeResult::Failed;
+		}
+	}
 
 	return EBTNodeResult::Succeeded;
 }

@@ -11,5 +11,9 @@ class FORGE_API UAaiAttackTask : public UBTTaskNode
 	GENERATED_BODY()
 
 public:
-	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;	
+	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+	TObjectPtr<UAnimMontage> AttackAnim;
 };

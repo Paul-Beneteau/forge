@@ -66,7 +66,7 @@ void AComBaseProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("AComBaseProjectile: HitActorEffect has not been set"));
+		UE_LOG(LogTemp, Warning, TEXT("AComBaseProjectile: projectile HitActorEffect is null"));
 	}
 
 	const AComPlayerCharacter* PlayerCharacter { Cast<AComPlayerCharacter>(GetInstigator())};

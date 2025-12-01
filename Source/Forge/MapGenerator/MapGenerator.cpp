@@ -32,7 +32,7 @@ void AMapGenerator::GenerateMap()
 		SpawnedTiles.Add(Tile);
 	}
 	
-	MovePlayerToStart(CachedMapGraph);
+	//MovePlayerToStart(CachedMapGraph);
 }
 
 void AMapGenerator::ClearMap()

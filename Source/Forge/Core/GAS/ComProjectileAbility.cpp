@@ -74,16 +74,21 @@ void UComProjectileAbility::SpawnProjectiles(int32 ProjectilesCount)
 
 	for (FRotator ProjectileRotation : ProjectileRotations)
 	{		
-		FVector ProjectileLocation = Character->GetMesh()->GetSocketLocation("BowEmitterSocket");		
-	
-		FActorSpawnParameters SpawnParams = FActorSpawnParameters();
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		SpawnParams.Instigator = Character;
-				
-		if (AComBaseProjectile* Projectile { GetWorld()->SpawnActor<AComBaseProjectile>(ProjectileClass, ProjectileLocation, ProjectileRotation, SpawnParams) })
+		FVector ProjectileLocation = Character->GetMesh()->GetSocketLocation("BowEmitterSocket");
+
+		AComBaseProjectile* Projectile = GetWorld()->SpawnActorDeferred<AComBaseProjectile>(
+			ProjectileClass,
+			FTransform(ProjectileRotation, ProjectileLocation),
+			nullptr,
+			Character,
+			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+
+		if (Projectile)
 		{
 			Projectile->HitActorGameplayEffect = GameplayEffectClass;
 			Projectile->InstigatorAbility = this;
+    
+			Projectile->FinishSpawning(FTransform(ProjectileRotation, ProjectileLocation));
 		}
 		else
 		{

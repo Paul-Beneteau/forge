@@ -32,6 +32,9 @@ void UComWorldUserWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaT
 		}
 		else
 		{
+			const FVector2D WidgetSize = ParentSizeBox->GetDesiredSize();
+			ScreenPos -= WidgetSize * 0.5f;
+			
 			ParentSizeBox->SetRenderTranslation(ScreenPos);
 		}
 		
