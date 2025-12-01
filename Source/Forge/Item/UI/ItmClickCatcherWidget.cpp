@@ -16,7 +16,7 @@ FReply UItmClickCatcherWidget::NativeOnMouseButtonDown(const FGeometry& InGeomet
 		// avoiding player to make another action at the same time
 		// TODO: Find a way to handle this logic outside the widget
 		OnClicked.Broadcast();
-		return FReply::Handled();
+		//return FReply::Handled();
 	}
 
 	// Do not consume player input

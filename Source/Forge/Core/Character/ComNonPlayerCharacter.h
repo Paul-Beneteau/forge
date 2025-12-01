@@ -33,9 +33,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="GAS")
 	TObjectPtr<UAnimMontage> DeathMontage = nullptr;
-	
+
 	UFUNCTION()
 	void HandleHealthChanged(AActor* EffectInstigator, float OldValue, float NewValue);
 
-	void Die();
+	void Die();	
 };

@@ -109,8 +109,8 @@ void UItmInventoryRootWidget::NativeConstruct()
 	// Align widget to have his bottom border anchored above grid slot widget 
 	ItemTooltipWidget->SetAlignmentInViewport(FVector2D(0.5f, 1.0f));
 
-	check(ClickCatcher);
-	ClickCatcher->OnClicked.AddDynamic(this, &UItmInventoryRootWidget::HandleClickOutside);
+	//check(ClickCatcher);
+	//ClickCatcher->OnClicked.AddDynamic(this, &UItmInventoryRootWidget::HandleClickOutside);
 }
 
 // HeldItemWidget follow cursor position when holding an item

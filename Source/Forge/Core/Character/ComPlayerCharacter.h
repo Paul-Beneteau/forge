@@ -6,6 +6,10 @@
 #include "ComPlayerDataAsset.h"
 #include "ComPlayerCharacter.generated.h"
 
+class UItmInventoryRootWidget;
+class UItmInventoryManager;
+class UItmInventoryComponent;
+class UItmEquipmentComponent;
 class UGameplayEffect;
 class UComAbilitySystemComponent;
 class UComDamageModifierAttributeSet;
@@ -78,6 +82,18 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Respawn")
 	float RespawnDelay = 4.0f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory")
+	TObjectPtr<UItmEquipmentComponent> EquipmentComp;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory")
+	TObjectPtr<UItmInventoryComponent> InventoryComp;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory")
+	TObjectPtr<UItmInventoryManager> InventoryManager;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Inventory")
+	TSubclassOf<UItmInventoryRootWidget> InventoryWidgetClass;
+
+	virtual void BeginPlay() override;
 	
 	/** Input handlers for SetDestination action. */
 	void OnInputStarted();

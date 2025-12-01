@@ -14,6 +14,10 @@
 #include "Forge/Core/GAS/ComAbilitySystemComponent.h"
 #include "Forge/Core/GAS/ComCombatAttributeSet.h"
 #include "Forge/Core/GAS/ComDamageModifierAttributeSet.h"
+#include "Forge/Item/Components/ItmEquipmentComponent.h"
+#include "Forge/Item/Components/ItmInventoryComponent.h"
+#include "Forge/Item/Managers/ItmInventoryManager.h"
+#include "Forge/Item/UI/ItmInventoryRootWidget.h"
 #include "Forge/MapGenerator/MapGenerator.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -56,6 +60,9 @@ AComPlayerCharacter::AComPlayerCharacter()
 	AbilitySystemComp->AddAttributeSetSubobject<UComDamageModifierAttributeSet>(DamageAttributeSet);
 
 	CombatAttributeSet->OnHealthChanged.AddDynamic(this, &AComPlayerCharacter::HandleHealthChanged);
+
+	EquipmentComp = CreateDefaultSubobject<UItmEquipmentComponent>(TEXT("EquipmentComp"));
+	InventoryComp = CreateDefaultSubobject<UItmInventoryComponent>(TEXT("InventoryComp"));
 }
 
 // Binds Input actions from PlayerData DataSet with their corresponding callbacks
@@ -78,7 +85,7 @@ void AComPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	{
 		InputSubsystem->AddMappingContext(PlayerData->DefaultInputContext, 0);
 	}
-
+	
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent { Cast<UEnhancedInputComponent>(InputComponent) })
 	{
@@ -118,7 +125,7 @@ void AComPlayerCharacter::PossessedBy(AController* NewController)
 	check(InitialGameplayEffect);
 	AbilitySystemComp->ApplyGameplayEffectToSelf(InitialGameplayEffect->GetDefaultObject<UGameplayEffect>(), 1.0f, AbilitySystemComp->MakeEffectContext());
 
-	CombatAttributeSet->InitPeriodicAttributes();
+	CombatAttributeSet->InitPeriodicAttributes();	
 }
 
 UAbilitySystemComponent* AComPlayerCharacter::GetAbilitySystemComponent() const
@@ -180,9 +187,21 @@ void AComPlayerCharacter::SetInputActionAbility(UInputAction* InputAction, TSubc
 	}
 }
 
+void AComPlayerCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	InventoryManager = NewObject<UItmInventoryManager>(this);
+	InventoryManager->Initialize(GetController<APlayerController>(), InventoryComp, EquipmentComp, InventoryWidgetClass);
+}
+
 void AComPlayerCharacter::OnInputStarted()
 {
-	GetController()->StopMovement();	
+	GetController()->StopMovement();
+
+	// Tell there is an outside click to the inventory. Used to put item into the world.
+	if (UItmInventoryRootWidget* InventoryWidget = InventoryManager->GetInventoryRoot())
+		InventoryWidget->HandleClickOutside();
 }
 
 // Move toward destination while input is triggered
@@ -298,4 +317,3 @@ void AComPlayerCharacter::Respawn()
 
 	OnPlayerRespawn.Broadcast();
 }
-

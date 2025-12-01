@@ -6,7 +6,10 @@
 #include "Components/CapsuleComponent.h"
 #include "Forge/Core/GAS/ComAbilitySystemComponent.h"
 #include "Forge/Core/GAS/ComCombatAttributeSet.h"
+#include "Forge/Item/Components/ItmEquipmentComponent.h"
+#include "Forge/Item/Components/ItmInventoryComponent.h"
 #include "Forge/Item/Generation/ItmItemGeneratorSubsystem.h"
+#include "Forge/Item/Managers/ItmInventoryManager.h"
 
 AComNonPlayerCharacter::AComNonPlayerCharacter()
 {

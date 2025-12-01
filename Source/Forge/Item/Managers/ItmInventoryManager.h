@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Forge/Item/UI/ItmInventoryRootWidget.h"
 #include "ItmInventoryManager.generated.h"
 
 class UItmInventoryRootWidget;
@@ -20,6 +21,13 @@ public:
 	void Initialize(APlayerController* InPlayerController, UItmInventoryComponent* InInventoryComp, UItmEquipmentComponent* InEquipmentComp,
 		TSubclassOf<UItmInventoryRootWidget> InInventoryWidgetClass);
 
+	UItmInventoryRootWidget* GetInventoryRoot() { return InventoryWidget; };
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void ShowInventory() { InventoryWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible); };
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void HideInventory() { InventoryWidget->SetVisibility(ESlateVisibility::Hidden); };
+	
 protected:
 	UPROPERTY()
 	TObjectPtr<APlayerController> PlayerController { nullptr };

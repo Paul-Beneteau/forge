@@ -51,6 +51,10 @@ public:
 	
 	void RefreshEquipmentSlotTooltip(const EItmEquipmentSlot EquipmentSlot, const FItmItemInstance& NewItem);
 
+	// Callback to bind with player left click. Used to remove items from inventory
+	UFUNCTION()
+	void HandleClickOutside();
+	
 protected:
 	UPROPERTY(BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<UItmInventoryGridWidget> InventoryGrid;
@@ -76,9 +80,6 @@ protected:
 	TObjectPtr<UItmEquipmentSlotWidget> PrimaryWeaponSlotWidget;
 	UPROPERTY(BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<UItmEquipmentSlotWidget> SecondaryWeaponSlotWidget;
-
-	UPROPERTY(BlueprintReadWrite, meta=(BindWidget))
-	UItmClickCatcherWidget* ClickCatcher;
 	
 	UPROPERTY()
 	TMap<EItmEquipmentSlot, UItmEquipmentSlotWidget*> EquipmentSlotWidgets;
@@ -96,7 +97,7 @@ protected:
 	virtual void NativeConstruct() override;
 
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
-
+	
 	UFUNCTION()
 	void HandleGridSlotClicked(const int32 SlotIndex);
 	UFUNCTION()
@@ -110,7 +111,4 @@ protected:
 	void HandleEquipmentSlotHovered(EItmEquipmentSlot EquipmentSlot);
 	UFUNCTION()
 	void HandleEquipmentSlotUnhovered(EItmEquipmentSlot EquipmentSlot);
-
-	UFUNCTION()
-	void HandleClickOutside();
 };
