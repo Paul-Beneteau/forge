@@ -32,7 +32,7 @@ void AMapGenerator::GenerateMap()
 		SpawnedTiles.Add(Tile);
 	}
 	
-	//MovePlayerToStart(CachedMapGraph);
+	//MovePlayerToStart();
 }
 
 void AMapGenerator::ClearMap()
@@ -154,9 +154,9 @@ void AMapGenerator::BeginPlay()
 	}
 }
 
-void AMapGenerator::MovePlayerToStart(const FMapGraph& Graph)
+void AMapGenerator::MovePlayerToStart()
 {
-	FMapGraphCoord StartCoord = Graph.MainPathStart;	
+	FMapGraphCoord StartCoord = CachedMapGraph.MainPathStart;	
 	FVector StartLocation(-StartCoord.Row * TileSize, StartCoord.Column * TileSize, 150);
 
 	if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())

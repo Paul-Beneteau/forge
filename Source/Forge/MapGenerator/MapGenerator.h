@@ -32,6 +32,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	const FMapGraph& GetCachedGraph() { return CachedMapGraph; }; 
 	
+	void MovePlayerToStart();
+	
 	// Show the graph used to generate the current map
 	UFUNCTION(BlueprintCallable)
 	void ShowGraph() const;
@@ -56,7 +58,5 @@ protected:
 
 	FMapGraph CachedMapGraph;
 
-	virtual void BeginPlay() override;
-	
-	void MovePlayerToStart(const FMapGraph& Graph);
+	virtual void BeginPlay() override;	
 };

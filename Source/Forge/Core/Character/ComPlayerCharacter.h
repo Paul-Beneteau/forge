@@ -14,6 +14,8 @@ class USpringArmComponent;
 class UCameraComponent;
 class UInputAction;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerRespawn);
+
 UCLASS()
 class FORGE_API AComPlayerCharacter : public ACharacter, public IAbilitySystemInterface
 {
@@ -29,6 +31,9 @@ public:
 	TObjectPtr<UComDamageModifierAttributeSet> DamageAttributeSet;
 	UPROPERTY(EditDefaultsOnly, Category="GAS")
 	TSubclassOf<UGameplayEffect> InitialGameplayEffect;
+
+	UPROPERTY(BlueprintAssignable, Category="Respawn")
+	FOnPlayerRespawn OnPlayerRespawn;
 	
 	AComPlayerCharacter();
 	
@@ -67,9 +72,23 @@ protected:
 	// Saves input action handles to dynamically modify input ability binding.
 	UPROPERTY(BlueprintReadOnly)
 	TMap<TObjectPtr<UInputAction>, TSubclassOf<UGameplayAbility>> InputAbilityMap;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	TObjectPtr<UAnimMontage> DeathMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Respawn")
+	float RespawnDelay = 4.0f;
 	
 	/** Input handlers for SetDestination action. */
 	void OnInputStarted();
 	void OnSetDestinationTriggered();
 	void OnSetDestinationReleased();
+
+	UFUNCTION()
+	void HandleHealthChanged(AActor* EffectInstigator, float OldValue, float NewValue);
+
+	void Die();
+
+	UFUNCTION()
+	void Respawn();
 };

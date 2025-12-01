@@ -6,6 +6,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Forge/Core/GAS/ComAbilitySystemComponent.h"
 #include "Forge/Core/GAS/ComCombatAttributeSet.h"
+#include "Forge/Item/Generation/ItmItemGeneratorSubsystem.h"
 
 AComNonPlayerCharacter::AComNonPlayerCharacter()
 {
@@ -63,6 +64,12 @@ void AComNonPlayerCharacter::Die()
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("AComNonPlayerCharacter: Death montage has not been set"));
+	}
+
+	if (UItmItemGeneratorSubsystem* ItemGenerator = GetGameInstance()->GetSubsystem<UItmItemGeneratorSubsystem>())
+	{
+		FItmItemInstance ItemInstance = ItemGenerator->GenerateRandomItem();
+		ItemGenerator->SpawnWorldItem(ItemInstance, GetActorLocation());
 	}
 	
 	// Destroy after delay or ragdoll

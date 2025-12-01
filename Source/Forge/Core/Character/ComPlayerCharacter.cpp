@@ -10,9 +10,12 @@
 #include "Engine/World.h"
 #include "Engine/LocalPlayer.h"
 #include "AbilitySystemComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Forge/Core/GAS/ComAbilitySystemComponent.h"
 #include "Forge/Core/GAS/ComCombatAttributeSet.h"
 #include "Forge/Core/GAS/ComDamageModifierAttributeSet.h"
+#include "Forge/MapGenerator/MapGenerator.h"
+#include "Kismet/GameplayStatics.h"
 
 AComPlayerCharacter::AComPlayerCharacter()
 {	
@@ -51,6 +54,8 @@ AComPlayerCharacter::AComPlayerCharacter()
 	AbilitySystemComp->AddAttributeSetSubobject<UComCombatAttributeSet>(CombatAttributeSet);
 	DamageAttributeSet = CreateDefaultSubobject<UComDamageModifierAttributeSet>(TEXT("DamageAttributeSet"));
 	AbilitySystemComp->AddAttributeSetSubobject<UComDamageModifierAttributeSet>(DamageAttributeSet);
+
+	CombatAttributeSet->OnHealthChanged.AddDynamic(this, &AComPlayerCharacter::HandleHealthChanged);
 }
 
 // Binds Input actions from PlayerData DataSet with their corresponding callbacks
@@ -217,5 +222,80 @@ void AComPlayerCharacter::OnSetDestinationReleased()
 	}
 
 	SetDestinationTriggerDuration = 0.f;
+}
+
+void AComPlayerCharacter::HandleHealthChanged(AActor* EffectInstigator, float OldValue, float NewValue)
+{
+	if (NewValue <= 0.f && OldValue >= 0.f)
+		Die();
+}
+
+void AComPlayerCharacter::Die()
+{
+	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+		DisableInput(PlayerController);
+
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	
+	if (DeathMontage)
+	{
+		if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+		{
+			AnimInstance->Montage_Play(DeathMontage);
+
+			// Enable ragdoll for 1s so the character lay on the ground because death montage ends at a weird place.
+			// TODO: fix death anim montage
+			FOnMontageBlendingOutStarted BlendingOutDelegate;
+			BlendingOutDelegate.BindLambda([this](UAnimMontage* Montage, bool bInterrupted)
+			{
+				GetMesh()->bPauseAnims = true;
+
+				// Enable ragdoll
+				GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+				GetMesh()->SetSimulatePhysics(true);
+
+				FTimerHandle TimerHandle;
+				auto DisableRagdoll = [this](){ GetMesh()->SetSimulatePhysics(false); };
+				GetWorldTimerManager().SetTimer(TimerHandle, DisableRagdoll, 1.f, false);
+				
+			});
+			
+			AnimInstance->Montage_SetBlendingOutDelegate(BlendingOutDelegate, DeathMontage);
+		}
+		
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AComPlayerCharacter: DeathMontage has not been set"));
+	}
+
+	// Respawn after delay
+	FTimerHandle RespawnTimerHandle;
+	GetWorldTimerManager().SetTimer(RespawnTimerHandle, this, &AComPlayerCharacter::Respawn, RespawnDelay, false);
+}
+
+void AComPlayerCharacter::Respawn()
+{
+	if (AMapGenerator* MapGenerator = Cast<AMapGenerator>(UGameplayStatics::GetActorOfClass(GetWorld(), AMapGenerator::StaticClass())))
+		MapGenerator->MovePlayerToStart();
+	else
+		UE_LOG(LogTemp, Error, TEXT("AComPlayerCharacter: Can't set respawn location because there is no map generator"));
+
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	GetMesh()->SetSimulatePhysics(false);
+	GetMesh()->bPauseAnims = false;
+
+	// Reset mesh after ragdoll
+	// TODO: parametrize values
+	GetMesh()->AttachToComponent(GetCapsuleComponent(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -90.0f),FRotator(0.0f, -90.0f, 0.0f));
+	
+	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+		EnableInput(PlayerController);
+
+	if (AbilitySystemComp && InitialGameplayEffect)
+			AbilitySystemComp->ApplyGameplayEffectToSelf(InitialGameplayEffect.GetDefaultObject(), 1.0f, AbilitySystemComp->MakeEffectContext());
+
+	OnPlayerRespawn.Broadcast();
 }
 
