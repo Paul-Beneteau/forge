@@ -44,6 +44,7 @@ EBTNodeResult::Type UAaiMoveToTask::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 	
 	if (MoveToResult.Code == EPathFollowingRequestResult::Failed)
 	{
+		UE_LOG(LogTemp, Error, TEXT("UAaiMoveToTask: fail to move- no valid path"));
 		return EBTNodeResult::Failed;
 	}
 
@@ -63,7 +64,7 @@ void UAaiMoveToTask::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowin
 	{
 		return;
 	}
-
+	
 	if (UPathFollowingComponent* PathComp { CachedController->GetPathFollowingComponent() })
 	{
 		// Remove Callback bind to OnRequestFinished

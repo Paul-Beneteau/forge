@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AiSpawner/MapAiSpawner.h"
 #include "Engine/DataAsset.h"
 #include "MapGeneratorConfig.generated.h"
 
@@ -28,4 +29,7 @@ public:
 	// Tile templates available for selection.
 	UPROPERTY(EditDefaultsOnly, Category = "Tile Selection")
 	TArray<UMapTileTemplate*> TileTemplates;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AI Spawn")
+	FMapAiSpawnerConfig AiSpawnerConfig;
 };

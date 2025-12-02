@@ -50,7 +50,6 @@ void AAaiNonPlayerController::BeginPlay()
 	if (UseBlackboard(BehaviorTree->BlackboardAsset, BlackboardComp))
 	{
 		RunBehaviorTree(BehaviorTree);
-		BlackboardComp->SetValueAsVector(AiConfigData->SpawnLocationKeyName, GetPawn()->GetActorLocation());
 		
 		BlackboardComp->SetValueAsFloat(AiConfigData->AttackRangeKeyName, AiConfigData->AttackRange);
 
@@ -91,7 +90,10 @@ void AAaiNonPlayerController::OnPossess(APawn* InPawn)
 			CrowdFollowingComp->SetCrowdAnticipateTurns(true);
 			CrowdFollowingComp->SetCrowdAvoidanceQuality(ECrowdAvoidanceQuality::High);
 		}
-	}	
+	}
+
+	if (UseBlackboard(BehaviorTree->BlackboardAsset, BlackboardComp))
+		BlackboardComp->SetValueAsVector(AiConfigData->SpawnLocationKeyName, GetPawn()->GetActorLocation());
 }
 
 void AAaiNonPlayerController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)

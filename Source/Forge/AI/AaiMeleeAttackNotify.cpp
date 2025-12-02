@@ -26,11 +26,12 @@ void UAaiMeleeAttackNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequen
 	{		
 		for (const FOverlapResult& Overlap : Overlaps)
 		{			
-			AActor* HitActor = Overlap.GetActor();
-			if (!HitActor)
+			APawn* HitPawn = Cast<APawn>(Overlap.GetActor());
+			
+			if (!HitPawn || !HitPawn->IsPlayerControlled())
 				continue;
 
-			UAbilitySystemComponent* TargetAbilitySystemComp = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(HitActor);
+			UAbilitySystemComponent* TargetAbilitySystemComp = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(HitPawn);
 			if (!TargetAbilitySystemComp)
 				return;
 			

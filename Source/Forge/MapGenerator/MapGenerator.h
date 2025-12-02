@@ -4,6 +4,7 @@
 #include "GameFramework/Actor.h"
 #include "Graph/MapGraph.h"
 #include "MapGeneratorConfig.h"
+#include "AiSpawner/MapAiSpawner.h"
 #include "MapGenerator.generated.h"
 
 class UMapGeneratorConfig;
@@ -49,6 +50,9 @@ protected:
     
 	UPROPERTY()
 	TObjectPtr<UMapTileSelector> TileSelector;
+
+	UPROPERTY()
+	TObjectPtr<UMapAiSpawner> AiSpawner;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Map Generation")
 	int32 TileSize = 1000;

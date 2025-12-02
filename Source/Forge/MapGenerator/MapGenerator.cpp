@@ -7,7 +7,8 @@
 AMapGenerator::AMapGenerator()
 {
 	GraphGenerator = CreateDefaultSubobject<UMapGraphGenerator>("GraphGenerator");
-	TileSelector = CreateDefaultSubobject<UMapTileSelector>("TileSelector");			
+	TileSelector = CreateDefaultSubobject<UMapTileSelector>("TileSelector");
+	AiSpawner = CreateDefaultSubobject<UMapAiSpawner>("AiSpawner");
 }
 
 // Generates a graph, select tiles for each graph cells and spawn them.
@@ -30,6 +31,9 @@ void AMapGenerator::GenerateMap()
 			continue;
 
 		SpawnedTiles.Add(Tile);
+
+		if (CachedMapGraph.At(TileSpawnData.Coord).Connectors.IsEmpty())
+			AiSpawner->SpawnAiPack(GeneratorConfig->AiSpawnerConfig, TileSpawnData.GetWorldLocation(TileSize), TileSize);
 	}
 	
 	//MovePlayerToStart();
