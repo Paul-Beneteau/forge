@@ -32,5 +32,12 @@ class FORGE_API UMapAiSpawner : public UActorComponent
 
 public:	
 	
-	TArray<AComNonPlayerCharacter*> SpawnAiPack(const FMapAiSpawnerConfig& AiSpawnerConfig, const FVector& TileLocation, int32 TileSize);		
+	void SpawnAiPack(const FMapAiSpawnerConfig& AiSpawnerConfig, const FVector& TileLocation, int32 TileSize);
+
+	void RemoveSpawnedPacks();
+
+protected:
+	
+	UPROPERTY()
+	TArray<AComNonPlayerCharacter*> SpawnedPack;
 };

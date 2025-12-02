@@ -1,6 +1,8 @@
 #include "MapGenerator.h"
 
+#include "MapPortal.h"
 #include "Graph/MapGraphGenerator.h"
+#include "Kismet/GameplayStatics.h"
 #include "Tile/MapTile.h"
 #include "Tile/MapTileSelector.h"
 
@@ -13,9 +15,7 @@ AMapGenerator::AMapGenerator()
 
 // Generates a graph, select tiles for each graph cells and spawn them.
 void AMapGenerator::GenerateMap()
-{
-	ClearMap();
-	
+{	
 	CachedMapGraph = GraphGenerator->GenerateMapGraph();
 	
 	TArray<FMapTileSpawnData> TilesToSpawn = TileSelector->SelectTiles(CachedMapGraph);
@@ -34,9 +34,12 @@ void AMapGenerator::GenerateMap()
 
 		if (CachedMapGraph.At(TileSpawnData.Coord).Connectors.IsEmpty())
 			AiSpawner->SpawnAiPack(GeneratorConfig->AiSpawnerConfig, TileSpawnData.GetWorldLocation(TileSize), TileSize);
+
+		// Spawn a portal at the end
+		if (TileSpawnData.Coord == CachedMapGraph.MainPathEnd)
+			SpawnedPortal = GetWorld()->SpawnActor<AMapPortal>(GeneratorConfig->PortalClass,
+				TileSpawnData.GetWorldLocation(TileSize) + FVector(0.f, 0.f, 100.f ),	TileSpawnData.Rotation);
 	}
-	
-	//MovePlayerToStart();
 }
 
 void AMapGenerator::ClearMap()
@@ -49,6 +52,11 @@ void AMapGenerator::ClearMap()
     
 	SpawnedTiles.Empty();
 	CachedMapGraph.Reset();
+
+	if (SpawnedPortal)
+		SpawnedPortal->Destroy();
+
+	AiSpawner->RemoveSpawnedPacks();
 }
 
 namespace 
@@ -158,7 +166,7 @@ void AMapGenerator::BeginPlay()
 	}
 }
 
-void AMapGenerator::MovePlayerToStart()
+void AMapGenerator::TeleportPlayerToStart()
 {
 	FMapGraphCoord StartCoord = CachedMapGraph.MainPathStart;	
 	FVector StartLocation(-StartCoord.Row * TileSize, StartCoord.Column * TileSize, 150);
@@ -166,6 +174,9 @@ void AMapGenerator::MovePlayerToStart()
 	if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
 	{
 		if (APawn* Pawn = PlayerController->GetPawn())
+		{
 			Pawn->SetActorLocation(StartLocation);
+			PlayerController->StopMovement();
+		}
 	}
 }

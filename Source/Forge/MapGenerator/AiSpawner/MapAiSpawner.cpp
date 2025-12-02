@@ -3,12 +3,10 @@
 #include "Forge/Core/Character/ComNonPlayerCharacter.h"
 
 
-TArray<AComNonPlayerCharacter*> UMapAiSpawner::SpawnAiPack(const FMapAiSpawnerConfig& AiSpawnerConfig, const FVector& TileLocation, int32 TileSize)
+void UMapAiSpawner::SpawnAiPack(const FMapAiSpawnerConfig& AiSpawnerConfig, const FVector& TileLocation, int32 TileSize)
 {
 	if (FMath::FRand() > AiSpawnerConfig.ChanceToSpawnPerTile)
-		return TArray<AComNonPlayerCharacter*>();
-	
-	TArray<AComNonPlayerCharacter*> AiSpawned;
+		return;
 
 	const float SpawnRadius = TileSize * 0.30f;
 
@@ -29,7 +27,7 @@ TArray<AComNonPlayerCharacter*> UMapAiSpawner::SpawnAiPack(const FMapAiSpawnerCo
 				FRotator::ZeroRotator);
 			if (AiCharacter)
 			{
-				AiSpawned.Add(AiCharacter);
+				SpawnedPack.Add(AiCharacter);
 				break;
 			}
 			else
@@ -38,6 +36,15 @@ TArray<AComNonPlayerCharacter*> UMapAiSpawner::SpawnAiPack(const FMapAiSpawnerCo
 			}
 		}
 	}
+}
 
-	return AiSpawned;
+void UMapAiSpawner::RemoveSpawnedPacks()
+{
+	for (AComNonPlayerCharacter* AiCharacter : SpawnedPack)
+	{
+		if (AiCharacter)
+			AiCharacter->Destroy();
+	}
+
+	SpawnedPack.Reset();
 }

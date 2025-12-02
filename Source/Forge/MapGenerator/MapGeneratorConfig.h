@@ -5,6 +5,7 @@
 #include "Engine/DataAsset.h"
 #include "MapGeneratorConfig.generated.h"
 
+class AMapPortal;
 class UMapTileTemplate;
 
 UCLASS(Blueprintable)
@@ -32,4 +33,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI Spawn")
 	FMapAiSpawnerConfig AiSpawnerConfig;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Portal")
+	TSubclassOf<AMapPortal> PortalClass;
 };

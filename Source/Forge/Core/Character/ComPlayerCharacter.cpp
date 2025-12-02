@@ -287,7 +287,7 @@ void AComPlayerCharacter::Die()
 void AComPlayerCharacter::Respawn()
 {
 	if (AMapGenerator* MapGenerator = Cast<AMapGenerator>(UGameplayStatics::GetActorOfClass(GetWorld(), AMapGenerator::StaticClass())))
-		MapGenerator->MovePlayerToStart();
+		MapGenerator->TeleportPlayerToStart();
 	else
 		UE_LOG(LogTemp, Error, TEXT("AComPlayerCharacter: Can't set respawn location because there is no map generator"));
 

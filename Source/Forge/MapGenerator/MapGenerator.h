@@ -31,9 +31,10 @@ public:
 	void ClearMap();
 
 	UFUNCTION(BlueprintCallable)
+	void TeleportPlayerToStart();
+
+	UFUNCTION(BlueprintCallable)
 	const FMapGraph& GetCachedGraph() { return CachedMapGraph; }; 
-	
-	void MovePlayerToStart();
 	
 	// Show the graph used to generate the current map
 	UFUNCTION(BlueprintCallable)
@@ -62,5 +63,8 @@ protected:
 
 	FMapGraph CachedMapGraph;
 
+	UPROPERTY()
+	TObjectPtr<AMapPortal> SpawnedPortal = nullptr;
+	
 	virtual void BeginPlay() override;	
 };

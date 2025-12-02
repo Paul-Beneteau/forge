@@ -80,8 +80,7 @@ TArray<FMapSegment> FMapPathGenerator::GenerateLPath()
 
 TArray<FMapSegment> FMapPathGenerator::GenerateUPath()
 {
-	// U Shape is L Shape with Third segment mirroring first segment's with length minus 1 (minus 1 because second segment's end cell overlaps
-	// visually, maintaining symmetry)
+	// U Shape is L Shape with Third segment with opposite direction of first segment
 	TArray<FMapSegment> Path = GenerateLPath();	
 	if (Path.IsEmpty())
 		return TArray<FMapSegment>();
@@ -92,8 +91,7 @@ TArray<FMapSegment> FMapPathGenerator::GenerateUPath()
 	FMapSegment ThirdSegment = GenerateSegment(
 		SecondSegment.End(),
 		MapUtils::Opposite(FirstSegment.Direction),
-		1,
-		FirstSegment.Length - 1);
+		1);
 	
 	if (!ThirdSegment.IsValid())
 		return TArray<FMapSegment>();
