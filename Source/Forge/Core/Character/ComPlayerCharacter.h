@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
-#include "ComPlayerDataAsset.h"
+#include "ComPlayerConfig.h"
 #include "ComPlayerCharacter.generated.h"
 
 class UItmInventoryRootWidget;
@@ -45,7 +45,6 @@ public:
 
 	virtual void PossessedBy(AController* NewController) override;
 	
-	// Implements IAbilitySystemInterface
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 	UFUNCTION()
@@ -56,42 +55,33 @@ public:
 	void SetInputActionAbility(UInputAction* InputAction, TSubclassOf<UGameplayAbility> Ability);
 	
 protected:
+	// Camera components
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	UCameraComponent* CameraComp;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	USpringArmComponent* SpringArmComp;
 
+	// Inventory components
+	UPROPERTY()
+	TObjectPtr<UItmEquipmentComponent> EquipmentComp;
+	UPROPERTY()
+	TObjectPtr<UItmInventoryComponent> InventoryComp;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory")
+	TObjectPtr<UItmInventoryManager> InventoryManager;
+	
 	/** Time Threshold to know if it was a  short click to set destination */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	float ClickToDestinationThreshold { 0.3f };	
 	float SetDestinationTriggerDuration { 0.0f };
 	
 	UPROPERTY(EditDefaultsOnly, Category="Data")
-	TObjectPtr<UComPlayerDataAsset> PlayerData;
+	TObjectPtr<UComPlayerConfig> PlayerConfig;
 
 	// Saves input action handles to dynamically modify input ability binding.
 	UPROPERTY()
-	TMap<TObjectPtr<UInputAction>, uint32> InputHandleMap;
-	
+	TMap<TObjectPtr<UInputAction>, uint32> InputHandleMap;	
 	// Saves input action handles to dynamically modify input ability binding.
 	UPROPERTY(BlueprintReadOnly)
 	TMap<TObjectPtr<UInputAction>, TSubclassOf<UGameplayAbility>> InputAbilityMap;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Animation")
-	TObjectPtr<UAnimMontage> DeathMontage;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Respawn")
-	float RespawnDelay = 4.0f;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory")
-	TObjectPtr<UItmEquipmentComponent> EquipmentComp;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory")
-	TObjectPtr<UItmInventoryComponent> InventoryComp;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory")
-	TObjectPtr<UItmInventoryManager> InventoryManager;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Inventory")
-	TSubclassOf<UItmInventoryRootWidget> InventoryWidgetClass;
 
 	virtual void BeginPlay() override;
 	
@@ -104,7 +94,6 @@ protected:
 	void HandleHealthChanged(AActor* EffectInstigator, float OldValue, float NewValue);
 
 	void Die();
-
 	UFUNCTION()
 	void Respawn();
 };

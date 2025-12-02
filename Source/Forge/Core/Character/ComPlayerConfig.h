@@ -3,7 +3,8 @@
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "Containers/Map.h"
-#include "ComPlayerDataAsset.generated.h"
+#include "Forge/Item/UI/ItmInventoryRootWidget.h"
+#include "ComPlayerConfig.generated.h"
 
 class UInputMappingContext;
 class UInputAction;
@@ -22,7 +23,7 @@ struct FComAbilityInput
 };
 
 UCLASS()
-class FORGE_API UComPlayerDataAsset : public UDataAsset
+class FORGE_API UComPlayerConfig : public UDataAsset
 {
 	GENERATED_BODY()
 
@@ -35,4 +36,18 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Input")
 	TObjectPtr<UInputAction> Move;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Respawn")
+	float RespawnDelay = 4.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	TObjectPtr<UAnimMontage> DeathMontage;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Inventory")
+	TSubclassOf<UItmInventoryRootWidget> InventoryWidgetClass;
+	
+	FORCEINLINE bool IsValid()
+	{
+		return DefaultInputContext && Move && DeathMontage && InventoryWidgetClass;
+	}
 };

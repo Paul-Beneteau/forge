@@ -65,43 +65,35 @@ AComPlayerCharacter::AComPlayerCharacter()
 	InventoryComp = CreateDefaultSubobject<UItmInventoryComponent>(TEXT("InventoryComp"));
 }
 
-// Binds Input actions from PlayerData DataSet with their corresponding callbacks
+// Binds Input actions from PlayerConfig DataSet with their corresponding callbacks
 void AComPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	check(PlayerConfig && PlayerConfig->IsValid());
 	
-	if (PlayerData == nullptr)
-	{
-		UE_LOG(LogTemp, Error, TEXT("AComPlayerCharacter: Player data asset has not been set"));
-		return;
-	}
+	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
+	ULocalPlayer* LocalPlayer = PlayerController->GetLocalPlayer();
 	
-	const APlayerController* PlayerController { GetController<APlayerController>() };
-	check(PlayerController);	
-	const ULocalPlayer* LocalPlayer { PlayerController->GetLocalPlayer() };
-	check(LocalPlayer);	
-	
-	if (UEnhancedInputLocalPlayerSubsystem* InputSubsystem { LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>() })
-	{
-		InputSubsystem->AddMappingContext(PlayerData->DefaultInputContext, 0);
-	}
+	if (UEnhancedInputLocalPlayerSubsystem* InputSubsystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
+		InputSubsystem->AddMappingContext(PlayerConfig->DefaultInputContext, 0);
 	
 	// Set up action bindings
-	if (UEnhancedInputComponent* EnhancedInputComponent { Cast<UEnhancedInputComponent>(InputComponent) })
+	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent))
 	{
 		// Bind movement input
-		EnhancedInputComponent->BindAction(PlayerData->Move, ETriggerEvent::Started, this, &AComPlayerCharacter::OnInputStarted);
-		EnhancedInputComponent->BindAction(PlayerData->Move, ETriggerEvent::Triggered, this, &AComPlayerCharacter::OnSetDestinationTriggered);
-		EnhancedInputComponent->BindAction(PlayerData->Move, ETriggerEvent::Completed, this, &AComPlayerCharacter::OnSetDestinationReleased);
-		EnhancedInputComponent->BindAction(PlayerData->Move, ETriggerEvent::Canceled, this, &AComPlayerCharacter::OnSetDestinationReleased);
+		EnhancedInputComponent->BindAction(PlayerConfig->Move, ETriggerEvent::Started, this, &AComPlayerCharacter::OnInputStarted);
+		EnhancedInputComponent->BindAction(PlayerConfig->Move, ETriggerEvent::Triggered, this, &AComPlayerCharacter::OnSetDestinationTriggered);
+		EnhancedInputComponent->BindAction(PlayerConfig->Move, ETriggerEvent::Completed, this, &AComPlayerCharacter::OnSetDestinationReleased);
+		EnhancedInputComponent->BindAction(PlayerConfig->Move, ETriggerEvent::Canceled, this, &AComPlayerCharacter::OnSetDestinationReleased);
 
 		// Bind Abilities input. Saves handle to modify dynamically input ability binding
-		for (FComAbilityInput AbilityInput : PlayerData->InitialAbilities)
+		for (FComAbilityInput AbilityInput : PlayerConfig->InitialAbilities)
 		{			
 			if (UInputAction* InputAction = AbilityInput.InputAction.Get(nullptr))
 			{
-				uint32 Handle { EnhancedInputComponent->BindAction(InputAction, ETriggerEvent::Started,
-					this, &AComPlayerCharacter::OnActivateAbilityStarted, AbilityInput.Ability).GetHandle() };
+				uint32 Handle = EnhancedInputComponent->BindAction(InputAction, ETriggerEvent::Started,this,
+					&AComPlayerCharacter::OnActivateAbilityStarted, AbilityInput.Ability).GetHandle();
 			
 				InputHandleMap.Add(InputAction, Handle);				
 				InputAbilityMap.Add(InputAction, AbilityInput.Ability);
@@ -117,12 +109,11 @@ void AComPlayerCharacter::PossessedBy(AController* NewController)
 	// Initialize GAS
 	AbilitySystemComp->InitAbilityActorInfo(this, this);
 	
-	for (FComAbilityInput AbilityInput : PlayerData->InitialAbilities)
+	for (FComAbilityInput AbilityInput : PlayerConfig->InitialAbilities)
 	{
 		AbilitySystemComp->GiveAbility(FGameplayAbilitySpec(AbilityInput.Ability));
 	}
 
-	check(InitialGameplayEffect);
 	AbilitySystemComp->ApplyGameplayEffectToSelf(InitialGameplayEffect->GetDefaultObject<UGameplayEffect>(), 1.0f, AbilitySystemComp->MakeEffectContext());
 
 	CombatAttributeSet->InitPeriodicAttributes();	
@@ -192,7 +183,7 @@ void AComPlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	InventoryManager = NewObject<UItmInventoryManager>(this);
-	InventoryManager->Initialize(GetController<APlayerController>(), InventoryComp, EquipmentComp, InventoryWidgetClass);
+	InventoryManager->Initialize(GetController<APlayerController>(), InventoryComp, EquipmentComp, PlayerConfig->InventoryWidgetClass);
 }
 
 void AComPlayerCharacter::OnInputStarted()
@@ -256,11 +247,11 @@ void AComPlayerCharacter::Die()
 
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
-	if (DeathMontage)
+	if (PlayerConfig->DeathMontage)
 	{
 		if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
 		{
-			AnimInstance->Montage_Play(DeathMontage);
+			AnimInstance->Montage_Play(PlayerConfig->DeathMontage);
 
 			// Enable ragdoll for 1s so the character lay on the ground because death montage ends at a weird place.
 			// TODO: fix death anim montage
@@ -279,7 +270,7 @@ void AComPlayerCharacter::Die()
 				
 			});
 			
-			AnimInstance->Montage_SetBlendingOutDelegate(BlendingOutDelegate, DeathMontage);
+			AnimInstance->Montage_SetBlendingOutDelegate(BlendingOutDelegate, PlayerConfig->DeathMontage);
 		}
 		
 	}
@@ -290,7 +281,7 @@ void AComPlayerCharacter::Die()
 
 	// Respawn after delay
 	FTimerHandle RespawnTimerHandle;
-	GetWorldTimerManager().SetTimer(RespawnTimerHandle, this, &AComPlayerCharacter::Respawn, RespawnDelay, false);
+	GetWorldTimerManager().SetTimer(RespawnTimerHandle, this, &AComPlayerCharacter::Respawn, PlayerConfig->RespawnDelay, false);
 }
 
 void AComPlayerCharacter::Respawn()
