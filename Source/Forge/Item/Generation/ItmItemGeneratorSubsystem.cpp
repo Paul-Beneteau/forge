@@ -3,18 +3,22 @@
 #include "ItmWorldItem.h"
 #include "Kismet/GameplayStatics.h"
 
+void UItmItemGeneratorSubsystem::TrySpawnItem(const FVector& Location)
+{
+	if (FMath::FRand() > ItemGeneratorConfig->ChangeToSpawnItem)
+		return;
+
+	SpawnWorldItem(GenerateRandomItem(), Location);
+}
+
 void UItmItemGeneratorSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 
-	// TODO: store asset path in an data asset
-	TSoftClassPtr<UUserWidget> SoftWidgetClass { FSoftObjectPath(TEXT("/Game/Item/UI/WBP_WorldItem.WBP_WorldItem_C")) };
-	WorldItemWidgetClass = SoftWidgetClass.LoadSynchronous();
-	check(WorldItemWidgetClass);
-
-	TSoftObjectPtr<UDataTable> ItemBasePoolAsset{ FSoftObjectPath(TEXT("/Game/Item/Config/DT_ItemBasePool.DT_ItemBasePool")) };
-	ItemBasePool = ItemBasePoolAsset.LoadSynchronous();
-	check(ItemBasePool);
+	TSoftObjectPtr<UItmItemGeneratorConfig> SoftPtr(FSoftObjectPath(TEXT("/Game/Item/Config/DA_ItemGeneratorConfig.DA_ItemGeneratorConfig")));
+	ItemGeneratorConfig = SoftPtr.LoadSynchronous();
+	
+	check(ItemGeneratorConfig && ItemGeneratorConfig->IsValid());
 }
 
 FItmItemInstance UItmItemGeneratorSubsystem::GenerateRandomItem() const
@@ -51,7 +55,7 @@ FItmItemInstance UItmItemGeneratorSubsystem::GenerateRandomItem() const
 
 FItmItemBase* UItmItemGeneratorSubsystem::GenerateRandomItemBase() const
 {
-	TArray<FName> ItemBaseRows = ItemBasePool->GetRowNames();
+	TArray<FName> ItemBaseRows = ItemGeneratorConfig->ItemBasePool->GetRowNames();
 	if (ItemBaseRows.IsEmpty())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("UItmItemGeneratorSubsystem: ItemBaseDataTable has no rows"));
@@ -60,7 +64,7 @@ FItmItemBase* UItmItemGeneratorSubsystem::GenerateRandomItemBase() const
 
 	const FName ItemBaseRow = ItemBaseRows[FMath::RandRange(0, ItemBaseRows.Num() - 1)];
 	
-	return ItemBasePool->FindRow<FItmItemBase>(ItemBaseRow, TEXT("ItemBase"));;
+	return ItemGeneratorConfig->ItemBasePool->FindRow<FItmItemBase>(ItemBaseRow, TEXT("ItemBase"));;
 }
 
 AItmWorldItem* UItmItemGeneratorSubsystem::SpawnWorldItem(const FItmItemInstance& Item, const FVector& Location) const
@@ -70,7 +74,7 @@ AItmWorldItem* UItmItemGeneratorSubsystem::SpawnWorldItem(const FItmItemInstance
 	
 	if (WorldItem)
 	{
-		WorldItem->Initialize(Item, WorldItemWidgetClass);
+		WorldItem->Initialize(Item, ItemGeneratorConfig->WorldItemWidgetClass);
 		UGameplayStatics::FinishSpawningActor(WorldItem, FTransform(FRotator::ZeroRotator, Location));
 	}
 	else

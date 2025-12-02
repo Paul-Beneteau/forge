@@ -70,10 +70,7 @@ void AComNonPlayerCharacter::Die()
 	}
 
 	if (UItmItemGeneratorSubsystem* ItemGenerator = GetGameInstance()->GetSubsystem<UItmItemGeneratorSubsystem>())
-	{
-		FItmItemInstance ItemInstance = ItemGenerator->GenerateRandomItem();
-		ItemGenerator->SpawnWorldItem(ItemInstance, GetActorLocation());
-	}
+		ItemGenerator->TrySpawnItem(GetActorLocation());
 	
 	// Destroy after delay or ragdoll
 	SetLifeSpan(LifeSpawn);
