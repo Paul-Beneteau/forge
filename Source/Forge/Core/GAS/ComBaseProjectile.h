@@ -11,47 +11,46 @@ class USphereComponent;
 class UBoxComponent;
 class UProjectileMovementComponent;
 
+// Base projectile actor. Apply HitActorGameplayEffect when a player actor is hit. HitActorGameplayEffect and InstigatorAbility has to be set by
+// the instigator
 UCLASS()
 class FORGE_API AComBaseProjectile : public AActor
 {
 	GENERATED_BODY()
 	
 public:
-	// Gameplay effect when actor is hit
-	TSubclassOf<UGameplayEffect> HitActorGameplayEffect;
-
-	UPROPERTY()
-	TObjectPtr<UGameplayAbility> InstigatorAbility;
 	
 	AComBaseProjectile();
+
+	void Initialize(TSubclassOf<UGameplayEffect> InHitActorGameplayEffect, TObjectPtr<UGameplayAbility> InInstigatorAbility);
 	
 	virtual void PostInitializeComponents() override;
 
-	virtual void BeginPlay();
+	virtual void BeginPlay() override;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
-	TObjectPtr<USphereComponent> RootComp;
-	
+	TObjectPtr<USphereComponent> RootComp;	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
-	TObjectPtr<UStaticMeshComponent> MeshComp;
-		
+	TObjectPtr<UStaticMeshComponent> MeshComp;		
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UProjectileMovementComponent> MovementComp;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UParticleSystemComponent> EffectComp;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	float LifeSpawn { 3.0 };
+	float LifeSpawn = 3.0;
 	
 	// Effect when projectile is spawned
 	UPROPERTY(EditDefaultsOnly, Category = "Particle")
 	TObjectPtr<UParticleSystem> HitWorldParticleEffect;
-
 	// Effect when projectile hit an actor
 	UPROPERTY(EditDefaultsOnly, Category = "Particle")
 	TObjectPtr<UParticleSystem> HitActorParticleEffect;
+
+	TSubclassOf<UGameplayEffect> HitActorGameplayEffect;
+	UPROPERTY()
+	TObjectPtr<UGameplayAbility> InstigatorAbility;
 	
 	UFUNCTION()
 	void OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,

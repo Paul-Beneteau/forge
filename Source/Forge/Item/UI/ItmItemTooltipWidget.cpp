@@ -20,17 +20,17 @@ void UItmItemTooltipWidget::Refresh(const FItmItemInstance& NewItem)
 void UItmItemTooltipWidget::SetAttributesLabel(const FItmItemInstance& Item)
 {
 	FString AttributesText;
-	const int32 AttributesLineCount { Item.Attributes.Num() };
+	const int32 AttributesLineCount = Item.Attributes.Num();
 
 	for (int32 i = 0; i < AttributesLineCount; ++i)
 	{
-		const FItmItemAttribute& ItemAttribute { Item.Attributes[i] };
+		const FItmItemAttribute& ItemAttribute = Item.Attributes[i];
 
 		// TODO: Remake the text formatting
-		const FString Operator { ItemAttribute.ModifierOp == EGameplayModOp::Additive ? TEXT("+") : TEXT("x") };
-		const FString AttributeName { Item.Attributes[i].Attribute.GetName() };		
-		
-		const FString AttributeLine { FString::Printf(TEXT("%s%.0f %s"), *Operator, ItemAttribute.Magnitude, *AttributeName) };
+		const FString Operator = ItemAttribute.ModifierOp == EGameplayModOp::Additive ? TEXT("+") : TEXT("x");
+		const FString AttributeName = Item.Attributes[i].Attribute.GetName();
+
+		const FString AttributeLine = FString::Printf(TEXT("%s%.0f %s"), *Operator, ItemAttribute.Magnitude, *AttributeName);
 
 		AttributesText += AttributeLine;
 		

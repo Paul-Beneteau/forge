@@ -22,11 +22,11 @@ protected:
 	FItmItemInstance Item;
 	
 	UPROPERTY()
-	TObjectPtr<UItmWorldItemWidget> WorldItemWidget { nullptr };
+	TObjectPtr<UItmWorldItemWidget> WorldItemWidget = nullptr;
 
-	TSubclassOf<UItmWorldItemWidget> WorldItemWidgetClass { nullptr };
-	
-	FVector2D WidgetCurrentScreenPos { FVector2D::ZeroVector };
+	TSubclassOf<UItmWorldItemWidget> WorldItemWidgetClass = nullptr;
+
+	FVector2D WidgetCurrentScreenPos = FVector2D::ZeroVector;
 	
 	virtual void BeginPlay() override;
 

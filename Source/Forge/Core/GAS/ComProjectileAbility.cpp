@@ -17,11 +17,11 @@ void UComProjectileAbility::ActivateAbility(const FGameplayAbilitySpecHandle Han
 	}
 
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-	
-	const AComPlayerCharacter* Character { CastChecked<AComPlayerCharacter>(GetAvatarActorFromActorInfo()) };
+
+	const AComPlayerCharacter* Character = CastChecked<AComPlayerCharacter>(GetAvatarActorFromActorInfo());
 
 	// Spawn a projectile in the direction of the cursor click
-	if (APlayerController* PlayerController { Cast<APlayerController>(Character->GetController()) } )
+	if (APlayerController* PlayerController = Cast<APlayerController>(Character->GetController()))
 	{
 		FHitResult Hit;
 		
@@ -31,7 +31,7 @@ void UComProjectileAbility::ActivateAbility(const FGameplayAbilitySpecHandle Han
 			// animation but this is not the focus of the project
 			Character->GetCharacterMovement()->bOrientRotationToMovement = false;
 
-			const FRotator CharacterRotation { (Hit.Location - GetAvatarActorFromActorInfo()->GetActorLocation()).Rotation() };
+			const FRotator CharacterRotation = (Hit.Location - GetAvatarActorFromActorInfo()->GetActorLocation()).Rotation();
 			
 			// Rotate toward click location
 			PlayerController->SetControlRotation(CharacterRotation);
@@ -45,17 +45,14 @@ void UComProjectileAbility::ActivateAbility(const FGameplayAbilitySpecHandle Han
 // Wait for character to rotate before spawning projectiles
 void UComProjectileAbility::OnCharacterRotated()
 {
-	AComPlayerCharacter* Character { CastChecked<AComPlayerCharacter>(GetAvatarActorFromActorInfo()) };
+	AComPlayerCharacter* Character = CastChecked<AComPlayerCharacter>(GetAvatarActorFromActorInfo());
 
 	// Wait until character finish rotating
 	if (Character->ReachedDesiredRotation() == false)
-	{
 		return;
-	}
 
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
 	
-	// Reactivate bOrientRotationToMovement after character rotated
 	Character->GetCharacterMovement()->bOrientRotationToMovement = true;	
 
 	// Add the AdditionalProjectile modifier that can increase number of projectile
@@ -67,27 +64,21 @@ void UComProjectileAbility::OnCharacterRotated()
 // Compute the direction of each projectile and spawn them
 void UComProjectileAbility::SpawnProjectiles(int32 ProjectilesCount)
 {
-	
-	AComPlayerCharacter* Character { CastChecked<AComPlayerCharacter>(GetAvatarActorFromActorInfo()) };
-	
-	TArray<FRotator> ProjectileRotations { GetProjectileRotations(ProjectilesCount) };
+
+	AComPlayerCharacter* Character = CastChecked<AComPlayerCharacter>(GetAvatarActorFromActorInfo());
+
+	TArray<FRotator> ProjectileRotations = GetProjectileRotations(ProjectilesCount);
 
 	for (FRotator ProjectileRotation : ProjectileRotations)
 	{		
 		FVector ProjectileLocation = Character->GetMesh()->GetSocketLocation("BowEmitterSocket");
 
-		AComBaseProjectile* Projectile = GetWorld()->SpawnActorDeferred<AComBaseProjectile>(
-			ProjectileClass,
-			FTransform(ProjectileRotation, ProjectileLocation),
-			nullptr,
-			Character,
-			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+		AComBaseProjectile* Projectile = GetWorld()->SpawnActorDeferred<AComBaseProjectile>(ProjectileClass,
+			FTransform(ProjectileRotation, ProjectileLocation),nullptr, Character, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
 		if (Projectile)
 		{
-			Projectile->HitActorGameplayEffect = GameplayEffectClass;
-			Projectile->InstigatorAbility = this;
-    
+			Projectile->Initialize(GameplayEffectClass, this);
 			Projectile->FinishSpawning(FTransform(ProjectileRotation, ProjectileLocation));
 		}
 		else
@@ -103,8 +94,8 @@ void UComProjectileAbility::SpawnProjectiles(int32 ProjectilesCount)
 TArray<FRotator> UComProjectileAbility::GetProjectileRotations(int32 ProjectilesCount)
 {
 	check (ProjectilesCount > 0);
-	
-	const AComPlayerCharacter* Character { CastChecked<AComPlayerCharacter>(GetAvatarActorFromActorInfo()) };
+
+	const AComPlayerCharacter* Character = CastChecked<AComPlayerCharacter>(GetAvatarActorFromActorInfo());
 	
 	TArray<FRotator> ProjectileRotations;
 
@@ -114,7 +105,7 @@ TArray<FRotator> UComProjectileAbility::GetProjectileRotations(int32 Projectiles
 		return ProjectileRotations;
 	}
 
-	FRotator FirstProjectileRotation { Character->GetActorRotation() };
+	FRotator FirstProjectileRotation = Character->GetActorRotation();
 
 	// If there is less than 12 projectile, the spread is a predefined spread (15 degree). Else projectiles are spawn
 	// in a circle so the spread is 360 / ProjectilesCount.
@@ -123,7 +114,7 @@ TArray<FRotator> UComProjectileAbility::GetProjectileRotations(int32 Projectiles
 	if (ProjectilesCount < 12)
 	{		
 		// The total angle. each projectile is seperated by 15 degree
-		float TotalSpread { (ProjectilesCount - 1) * ProjectileSpread };
+		float TotalSpread = (ProjectilesCount - 1) * ProjectileSpread;
 
 		// The character rotation is at the middle of the spread. So we can subtract half of the spread to get the first
 		// projectile, or add it to get the last projectile
@@ -131,9 +122,7 @@ TArray<FRotator> UComProjectileAbility::GetProjectileRotations(int32 Projectiles
 	}
 	
 	for (int32 i = 0; i < ProjectilesCount; ++i)
-	{
 		ProjectileRotations.Add(FirstProjectileRotation + FRotator(0.0f, ProjectileSpread * i, 0.0f));
-	}
 	
 	return ProjectileRotations;
 }

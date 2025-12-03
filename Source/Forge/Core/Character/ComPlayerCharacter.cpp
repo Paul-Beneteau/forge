@@ -106,13 +106,10 @@ void AComPlayerCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
-	// Initialize GAS
 	AbilitySystemComp->InitAbilityActorInfo(this, this);
 	
 	for (FComAbilityInput AbilityInput : PlayerConfig->InitialAbilities)
-	{
 		AbilitySystemComp->GiveAbility(FGameplayAbilitySpec(AbilityInput.Ability));
-	}
 
 	AbilitySystemComp->ApplyGameplayEffectToSelf(InitialGameplayEffect->GetDefaultObject<UGameplayEffect>(), 1.0f, AbilitySystemComp->MakeEffectContext());
 
@@ -132,20 +129,22 @@ void AComPlayerCharacter::OnActivateAbilityStarted(const TSubclassOf<UGameplayAb
 // Remove the current ability bound to the input action and binds the new ability
 void AComPlayerCharacter::SetInputActionAbility(UInputAction* InputAction, TSubclassOf<UGameplayAbility> Ability)
 {
-	check(InputAction && Ability);
-	
-	if (UEnhancedInputComponent* EnhancedInputComponent { Cast<UEnhancedInputComponent>(InputComponent) })
+	if(!InputAction || !Ability)
 	{
-		// Iterate to find if the ability added was already bound with another input to prevent an ability to be used by
-		// 2 input actions. It is not efficient to iterate with a TMap but as there is only a few input it's fine.
-		const UInputAction* AbilityCurrentInputAction { nullptr };			
+		UE_LOG(LogTemp, Error, TEXT("AComPlayerCharacter: InputAction or Ability is null in SetInputActionAbility()"));
+		return;
+	}
+	
+	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent))
+	{
+		// Iterate to find if the ability added was already bound with another input to prevent an ability to be used by 2 input actions. It is not
+		// efficient to iterate with a TMap but as there is only a few input it's fine.
+		const UInputAction* AbilityCurrentInputAction = nullptr;			
 
 		for (const TPair<TObjectPtr<UInputAction>, TSubclassOf<UGameplayAbility>>& Pair : InputAbilityMap)
 		{
 			if (Pair.Value == Ability)
-			{
 				AbilityCurrentInputAction = Pair.Key;
-			}
 		}
 
 		// Remove current input action bound to the ability if the ability was already used by an input
@@ -170,8 +169,8 @@ void AComPlayerCharacter::SetInputActionAbility(UInputAction* InputAction, TSubc
 		}
 		
 		// Add new binding and save the handle and ability
-		uint32 NewHandle { EnhancedInputComponent->BindAction(InputAction, ETriggerEvent::Started,
-	this, &AComPlayerCharacter::OnActivateAbilityStarted, Ability).GetHandle() };
+		uint32 NewHandle = EnhancedInputComponent->BindAction(InputAction, ETriggerEvent::Started,this,
+			&AComPlayerCharacter::OnActivateAbilityStarted, Ability).GetHandle();
 
 		InputHandleMap.Add(InputAction, NewHandle);
 		InputAbilityMap.Add(InputAction, Ability);
@@ -200,14 +199,14 @@ void AComPlayerCharacter::OnSetDestinationTriggered()
 {
 	SetDestinationTriggerDuration += GetWorld()->GetDeltaSeconds();
 
-	if (APlayerController* PlayerController { Cast<APlayerController>(GetController()) })
+	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
 	{
 		// Get destination location at the cursor position
 		FHitResult Hit;
 		if (PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, true, Hit))
 		{
 			// Move towards destination
-			FVector WorldDirection { (Hit.Location - GetActorLocation()).GetSafeNormal() };
+			FVector WorldDirection = (Hit.Location - GetActorLocation()).GetSafeNormal();
 			AddMovementInput(WorldDirection, 1.0, false);
 		}
 	}
@@ -219,8 +218,8 @@ void AComPlayerCharacter::OnSetDestinationReleased()
 	// If this is a short click
 	if (SetDestinationTriggerDuration <= ClickToDestinationThreshold)
 	{
-		// Get destination location at the cursor position 
-		if (APlayerController* PlayerController { Cast<APlayerController>(GetController()) })
+		// Get destination location at the cursor position
+		if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
 		{
 			FHitResult Hit;
 			if (PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, true, Hit))
@@ -247,41 +246,26 @@ void AComPlayerCharacter::Die()
 
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
-	if (PlayerConfig->DeathMontage)
-	{
-		if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
-		{
-			AnimInstance->Montage_Play(PlayerConfig->DeathMontage);
-
-			// Enable ragdoll for 1s so the character lay on the ground because death montage ends at a weird place.
-			// TODO: fix death anim montage
-			FOnMontageBlendingOutStarted BlendingOutDelegate;
-			BlendingOutDelegate.BindLambda([this](UAnimMontage* Montage, bool bInterrupted)
-			{
-				GetMesh()->bPauseAnims = true;
-
-				// Enable ragdoll
-				GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-				GetMesh()->SetSimulatePhysics(true);
-
-				FTimerHandle TimerHandle;
-				auto DisableRagdoll = [this](){ GetMesh()->SetSimulatePhysics(false); };
-				GetWorldTimerManager().SetTimer(TimerHandle, DisableRagdoll, 1.f, false);
-				
-			});
-			
-			AnimInstance->Montage_SetBlendingOutDelegate(BlendingOutDelegate, PlayerConfig->DeathMontage);
-		}
-		
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("AComPlayerCharacter: DeathMontage has not been set"));
-	}
+	PlayDeathMontage();
 
 	// Respawn after delay
 	FTimerHandle RespawnTimerHandle;
 	GetWorldTimerManager().SetTimer(RespawnTimerHandle, this, &AComPlayerCharacter::Respawn, PlayerConfig->RespawnDelay, false);
+}
+
+void AComPlayerCharacter::PlayDeathMontage()
+{    
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (!AnimInstance)
+		return;
+    
+	AnimInstance->Montage_Play(PlayerConfig->DeathMontage);
+    
+	// Stop animation after death montage to avoid character going back on feet with animation blueprint
+	// TODO: Find cleaner way to stop animation without 0.25f delay. Fix death montage.
+	FTimerHandle TimerHandle;
+	auto StopAnim = [this]() { GetMesh()->bPauseAnims = true; };
+	GetWorldTimerManager().SetTimer(TimerHandle,StopAnim ,PlayerConfig->DeathMontage->GetPlayLength() - 0.25f,false);
 }
 
 void AComPlayerCharacter::Respawn()
@@ -295,8 +279,7 @@ void AComPlayerCharacter::Respawn()
 	GetMesh()->SetSimulatePhysics(false);
 	GetMesh()->bPauseAnims = false;
 
-	// Reset mesh after ragdoll
-	// TODO: parametrize values
+	// Reset mesh after ragdoll. TODO: parametrize values
 	GetMesh()->AttachToComponent(GetCapsuleComponent(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -90.0f),FRotator(0.0f, -90.0f, 0.0f));
 	

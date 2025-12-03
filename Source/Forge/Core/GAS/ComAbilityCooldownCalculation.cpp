@@ -5,7 +5,7 @@
 
 float UComAbilityCooldownCalculation::CalculateBaseMagnitude_Implementation(const FGameplayEffectSpec& Spec) const
 {
-	float Cooldown { 0.0f };
+	float Cooldown = 0.0f;
 	
 	IAbilitySystemInterface* Instigator = Cast<IAbilitySystemInterface>(Spec.GetEffectContext().GetInstigator());
 	if (Instigator == nullptr)
@@ -22,8 +22,8 @@ float UComAbilityCooldownCalculation::CalculateBaseMagnitude_Implementation(cons
 	}
 		
 	if (AbilitySystemComp->HasAttributeSetForAttribute(UComCombatAttributeSet::GetAttackSpeedAttribute()))
-	{			
-		if (float AttackSpeed { AbilitySystemComp->GetNumericAttribute(UComCombatAttributeSet::GetAttackSpeedAttribute()) })
+	{
+		if (float AttackSpeed = AbilitySystemComp->GetNumericAttribute(UComCombatAttributeSet::GetAttackSpeedAttribute()))
 		{
 			// Attack speed is the number of attack per seconds. The cooldown in second is one second divided by the number of attack per seconds
 			Cooldown = 1.0f / AttackSpeed;

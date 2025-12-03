@@ -20,6 +20,7 @@ class UInputAction;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerRespawn);
 
+// Player Character. Handles inputs, GAS components, inventory components and character death.
 UCLASS()
 class FORGE_API AComPlayerCharacter : public ACharacter, public IAbilitySystemInterface
 {
@@ -70,8 +71,8 @@ protected:
 	TObjectPtr<UItmInventoryManager> InventoryManager;
 	
 	/** Time Threshold to know if it was a  short click to set destination */
-	float ClickToDestinationThreshold { 0.3f };	
-	float SetDestinationTriggerDuration { 0.0f };
+	float ClickToDestinationThreshold = 0.3f;
+	float SetDestinationTriggerDuration = 0.0f;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Data")
 	TObjectPtr<UComPlayerConfig> PlayerConfig;
@@ -94,6 +95,9 @@ protected:
 	void HandleHealthChanged(AActor* EffectInstigator, float OldValue, float NewValue);
 
 	void Die();
+	
+	void PlayDeathMontage();
+	
 	UFUNCTION()
 	void Respawn();
 };

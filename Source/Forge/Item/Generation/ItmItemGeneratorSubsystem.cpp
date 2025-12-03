@@ -33,15 +33,15 @@ FItmItemInstance UItmItemGeneratorSubsystem::GenerateRandomItem() const
 	FItmItemInstance RandomItem;
 	RandomItem.ItemBase = *ItemBase;
 
-	constexpr int32 MaxAttributesCount { 6 };
+	constexpr int32 MaxAttributesCount = 6;
 	// Generate the number of attributes for the item
-	const int32 RandomAttributesCount { FMath::RandRange(1, MaxAttributesCount) };
+	const int32 RandomAttributesCount = FMath::RandRange(1, MaxAttributesCount);
 
 	TArray<FItmItemAttributeTemplate> AttributeTemplates = RandomItem.ItemBase.AttributeTemplates;
 	
 	for (int32 AttributeIndex = 0; AttributeIndex < RandomAttributesCount && AttributeTemplates.Num() > 0; ++AttributeIndex)
 	{
-		const int32 RandomTemplateIndex { FMath::RandRange(0, AttributeTemplates.Num() - 1) };		
+		const int32 RandomTemplateIndex = FMath::RandRange(0, AttributeTemplates.Num() - 1);		
 
 		// Add a random attribute to the item generated
 		RandomItem.Attributes.Add(AttributeTemplates[RandomTemplateIndex].GenerateRandomAttribute());

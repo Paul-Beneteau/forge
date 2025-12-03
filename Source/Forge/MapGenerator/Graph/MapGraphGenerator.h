@@ -27,8 +27,8 @@ public:
 	FMapGraph GenerateMapGraph();
 	
 protected:
-	int32 Rows { 0 };
-	int32 Columns { 0 };
+	int32 Rows = 0;
+	int32 Columns = 0;
 
 	// Map graph generated
 	FMapGraph CachedMapGraph;
@@ -38,7 +38,7 @@ protected:
 	TObjectPtr<UDataTable> LayoutConfigTable;
 	
 	// maximum number of retries if the layout generation fails
-	int32 MaxLayoutGenerationRetries { 25 };
+	int32 MaxLayoutGenerationRetries = 25;
 
 	// Pick a random layout config from LayoutConfigTable
 	FMapLayoutConfig PickLayoutConfig();

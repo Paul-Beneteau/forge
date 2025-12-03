@@ -85,14 +85,14 @@ protected:
 	TMap<EItmEquipmentSlot, UItmEquipmentSlotWidget*> EquipmentSlotWidgets;
 
 	UPROPERTY()
-	TObjectPtr<UItmHeldItemWidget> HeldItemWidget { nullptr };
+	TObjectPtr<UItmHeldItemWidget> HeldItemWidget = nullptr;
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UItmHeldItemWidget> HeldItemWidgetClass { nullptr };
-	
+	TSubclassOf<UItmHeldItemWidget> HeldItemWidgetClass = nullptr;
+
 	UPROPERTY()
-	TObjectPtr<UItmItemTooltipWidget> ItemTooltipWidget { nullptr };
+	TObjectPtr<UItmItemTooltipWidget> ItemTooltipWidget = nullptr;
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UItmItemTooltipWidget> ItemTooltipWidgetClass { nullptr };
+	TSubclassOf<UItmItemTooltipWidget> ItemTooltipWidgetClass = nullptr;
 	
 	virtual void NativeConstruct() override;
 

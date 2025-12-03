@@ -27,12 +27,12 @@ void UItmInventoryRootWidget::RefreshHeldItem(const FItmInventoryEntry& NewItem)
 }
 
 void UItmInventoryRootWidget::RefreshGridSlotTooltip(const int32 SlotIndex, const FItmInventoryEntry& NewItem)
-{	
-	const FVector2D GridSlotWidgetPosition { InventoryGrid->GetSlotPosition(SlotIndex) };
-	const FVector2D GridSlotWidgetSize { InventoryGrid->GetSlotSize(SlotIndex)};
+{
+	const FVector2D GridSlotWidgetPosition = InventoryGrid->GetSlotPosition(SlotIndex);
+	const FVector2D GridSlotWidgetSize = InventoryGrid->GetSlotSize(SlotIndex);
 
 	// Tooltip position is just above the grid slot widget with tooltip lower border just above grid slot upper border
-	const FVector2D AbsoluteTooltipPosition { GridSlotWidgetPosition + FVector2D(GridSlotWidgetSize.X * 0.5f, 0.f) };
+	const FVector2D AbsoluteTooltipPosition = GridSlotWidgetPosition + FVector2D(GridSlotWidgetSize.X * 0.5f, 0.f);
 
 	// convert absolute to viewport coords for DPI scaling
 	FVector2D PixelPosition;

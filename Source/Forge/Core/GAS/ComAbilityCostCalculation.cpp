@@ -4,7 +4,7 @@
 
 float UComAbilityCostCalculation::CalculateBaseMagnitude_Implementation(const FGameplayEffectSpec& Spec) const
 {
-	const UComGameplayAbility* Ability { Cast<UComGameplayAbility>(Spec.GetEffectContext().GetAbility()) };
+	const UComGameplayAbility* Ability = Cast<UComGameplayAbility>(Spec.GetEffectContext().GetAbility());
 	
 	if (Ability == nullptr)
 	{

@@ -14,6 +14,7 @@ GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnAttributeChanged, AActor*, EffectInstigator, float, OldValue, float, NewValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnPeriodicAttributeChanged, FGameplayAttribute, Attribute, float, EffectModifierMagnitude, FName, EffectName);
 
+// Core attribute set containing every base stats a character needs
 UCLASS()
 class FORGE_API UComCombatAttributeSet : public UAttributeSet
 {
@@ -67,8 +68,8 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Attribute")
 	FGameplayAttributeData ManaRegen;
 	
-	float HealthBeforeChange { 0.0f };	
-	float ManaBeforeChange { 0.0f };
+	float HealthBeforeChange = 0.0f;
+	float ManaBeforeChange = 0.0f;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Attribute")
 	FGameplayAttributeData AttackSpeed;
@@ -81,7 +82,7 @@ protected:
 
 	// Period of attribute with infinite duration (eg: health/mana regen)
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "PeriodicAttribute")
-	float AttributePeriod { 1.0f };
+	float AttributePeriod = 1.0f;
 
 	// Contains every active periodic effect with their target attribute
 	TMap<FGameplayAttribute, FActiveGameplayEffectHandle> ActivePeriodicEffectMap;

@@ -15,7 +15,7 @@ TArray<FMapSegment> FMapPathGenerator::GeneratePath(const FMapPathConfig& InPath
 	// Pick a random layout
 	if (InPathConfig.Layout == EMapPathLayout::Random)
 	{
-		TArray<EMapPathLayout> PossibleLayouts { EMapPathLayout::Straight, EMapPathLayout::L, EMapPathLayout::Stairs, EMapPathLayout::U };
+		TArray<EMapPathLayout> PossibleLayouts = { EMapPathLayout::Straight, EMapPathLayout::L, EMapPathLayout::Stairs, EMapPathLayout::U };
 		PathGenerator.PathConfig.Layout = PossibleLayouts[FMath::RandRange(0, PossibleLayouts.Num() - 1)];
 	}
 		

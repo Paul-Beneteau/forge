@@ -32,17 +32,17 @@ public:
 	
 protected:
 	UPROPERTY(BlueprintReadWrite, meta=(BindWidget))
-	TObjectPtr<UUniformGridPanel> GridPanel { nullptr };
+	TObjectPtr<UUniformGridPanel> GridPanel = nullptr;
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UItmInventoryGridSlotWidget> GridSlotClass { nullptr };
-	
-	int32 ColumnCount { 12 };	
-	int32 RowCount { 5 };
+	TSubclassOf<UItmInventoryGridSlotWidget> GridSlotClass = nullptr;
+
+	int32 ColumnCount = 12;
+	int32 RowCount = 5;
 
 	UPROPERTY()
-	TObjectPtr<UItmItemTooltipWidget> ItemTooltipWidget { nullptr };
+	TObjectPtr<UItmItemTooltipWidget> ItemTooltipWidget = nullptr;
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UItmItemTooltipWidget> ItemTooltipWidgetClass { nullptr };
+	TSubclassOf<UItmItemTooltipWidget> ItemTooltipWidgetClass = nullptr;
 	
 	virtual void NativeConstruct() override;
 

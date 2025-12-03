@@ -4,7 +4,7 @@
 #include "BehaviorTree/BTTaskNode.h"
 #include "AaiAttackTask.generated.h"
 
-// Attack placeholder task
+// Attack task for behavior tree.
 UCLASS()
 class FORGE_API UAaiAttackTask : public UBTTaskNode
 {
@@ -12,8 +12,4 @@ class FORGE_API UAaiAttackTask : public UBTTaskNode
 
 public:
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
-
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
-	TObjectPtr<UAnimMontage> AttackAnim;
 };

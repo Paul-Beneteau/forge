@@ -21,7 +21,7 @@ protected:
 	TObjectPtr<UImage> ItemImage;
 	
 	// TODO: Parametrize size
-	FVector2D ItemImageSize { FVector2D(50.f, 50.f) };
+	FVector2D ItemImageSize = FVector2D(50.f, 50.f);
 	
 	virtual void NativeConstruct() override;
 };

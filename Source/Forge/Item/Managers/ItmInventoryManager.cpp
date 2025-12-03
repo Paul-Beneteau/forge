@@ -33,8 +33,8 @@ void UItmInventoryManager::Initialize(APlayerController* InPlayerController, UIt
 
 void UItmInventoryManager::HandleGridSlotClicked(int32 SlotIndex)
 {
-	FItmInventoryEntry NewGridSlotItem { InventoryComp->GetHeldItem() };
-	FItmInventoryEntry NewHeldItem { InventoryComp->GetGridSlotItem(SlotIndex) };
+	FItmInventoryEntry NewGridSlotItem = InventoryComp->GetHeldItem();
+	FItmInventoryEntry NewHeldItem = InventoryComp->GetGridSlotItem(SlotIndex);
 	
 	InventoryComp->SetHeldItem(NewHeldItem);
 	InventoryComp->SetGridSlotItem(SlotIndex, NewGridSlotItem);
@@ -62,7 +62,7 @@ void UItmInventoryManager::HandleEquipmentSlotClicked(EItmEquipmentSlot Equipmen
 		return;
 
 	// Unequip item
-	FItmItemInstance UnequippedItem { FItmItemInstance::Empty };
+	FItmItemInstance UnequippedItem = FItmItemInstance::Empty;
 	if (!EquipmentComp->IsSlotEmpty(EquipmentSlot))
 		UnequippedItem = EquipmentComp->UnequipItem(EquipmentSlot);	
 

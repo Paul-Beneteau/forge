@@ -28,6 +28,12 @@ AComBaseProjectile::AComBaseProjectile()
 	MovementComp->ProjectileGravityScale = 0.0f;
 }
 
+void AComBaseProjectile::Initialize(TSubclassOf<UGameplayEffect> InHitActorGameplayEffect, TObjectPtr<UGameplayAbility> InInstigatorAbility)
+{
+	HitActorGameplayEffect = InHitActorGameplayEffect;
+	InstigatorAbility = InInstigatorAbility;
+}
+
 void AComBaseProjectile::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
@@ -40,37 +46,27 @@ void AComBaseProjectile::BeginPlay()
 	Super::BeginPlay();
 
 	if (HitWorldParticleEffect)
-	{
 		UGameplayStatics::SpawnEmitterAtLocation(this, HitWorldParticleEffect, GetActorLocation(), GetActorRotation());
-	}
 	else
-	{
 		UE_LOG(LogTemp, Warning, TEXT("AComBaseProjectile: HitWorldEffect has not been set"));
-	}
 
 	SetLifeSpan(LifeSpawn);
 }
 
 // Apply the gameplay effect to the actor hit
-void AComBaseProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-                                        UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AComBaseProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor == GetInstigator() || OtherActor == this)
-	{
 		return;
-	}
 
 	if (HitActorParticleEffect)
-	{
 		UGameplayStatics::SpawnEmitterAtLocation(this, HitActorParticleEffect, GetActorLocation(), GetActorRotation());
-	}
 	else
-	{
 		UE_LOG(LogTemp, Warning, TEXT("AComBaseProjectile: projectile HitActorEffect is null"));
-	}
 
-	const AComPlayerCharacter* PlayerCharacter { Cast<AComPlayerCharacter>(GetInstigator())};
-	const AComNonPlayerCharacter* NonPlayerCharacter { Cast<AComNonPlayerCharacter>(OtherActor)};
+	const AComPlayerCharacter* PlayerCharacter = Cast<AComPlayerCharacter>(GetInstigator());
+	const AComNonPlayerCharacter* NonPlayerCharacter = Cast<AComNonPlayerCharacter>(OtherActor);
 	
 	if (PlayerCharacter && NonPlayerCharacter)
 	{
@@ -79,18 +75,14 @@ void AComBaseProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent
 		UAbilitySystemComponent* SourceAbilitySystemComp = PlayerCharacter->GetAbilitySystemComponent();
 		check(SourceAbilitySystemComp);
 	
-		FGameplayEffectContextHandle EffectHandle { SourceAbilitySystemComp->MakeEffectContext() };
+		FGameplayEffectContextHandle EffectHandle = SourceAbilitySystemComp->MakeEffectContext();
 		EffectHandle.SetAbility(InstigatorAbility);
 
 		if (HitActorGameplayEffect)
-		{
 			SourceAbilitySystemComp->ApplyGameplayEffectToTarget(HitActorGameplayEffect->GetDefaultObject<UGameplayEffect>(),
 				TargetAbilitySystemComp, 1.0f, EffectHandle);
-		}
 		else
-		{
 			UE_LOG(LogTemp, Error, TEXT("AComBaseProjectile: HitActorGameplayEffect has not been set"));
-		}
 	}
 	else
 	{

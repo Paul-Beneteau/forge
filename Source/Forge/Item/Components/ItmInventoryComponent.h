@@ -38,10 +38,10 @@ public:
 	
 protected:
 	TArray<FItmInventoryEntry> GridItems;
-	
-	int32 ColumnCount { 12 };
-	
-	int32 RowCount { 5 };
+
+	int32 ColumnCount = 12;
+
+	int32 RowCount = 5;
 	
 	FItmInventoryEntry HeldItem;
 };

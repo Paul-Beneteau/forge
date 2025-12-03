@@ -4,6 +4,7 @@
 #include "BehaviorTree/BTService.h"
 #include "AaiIsInAttackRangeService.generated.h"
 
+// Update blackboard key indicating if AI character is in attack range of target
 UCLASS()
 class FORGE_API UAaiIsInAttackRangeService : public UBTService
 {

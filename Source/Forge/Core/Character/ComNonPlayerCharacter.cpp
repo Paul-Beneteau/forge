@@ -45,34 +45,39 @@ void AComNonPlayerCharacter::HandleHealthChanged(AActor* EffectInstigator, float
 
 void AComNonPlayerCharacter::Die()
 {
-	// Stop AI behavior tree
+	// Stop AI behavior
 	if (const AAIController* AiController = Cast<AAIController>(GetController()))
-		AiController->BrainComponent->StopLogic(TEXT("Dead"));
-
+	{
+		if (AiController->BrainComponent)
+			AiController->BrainComponent->StopLogic(TEXT("Dead"));
+	}
+	
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-	float LifeSpawn = 3.0f;
 	
-	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
-	{
-		AnimInstance->Montage_Play(DeathMontage);
-		LifeSpawn = DeathMontage->GetPlayLength() + 1.5f;
-
-		// Stop animation after death montage to avoid the character to go back on his feet with the animation blueprint.
-		// TODO: find why a cleaner way to stop anim earlier than using a 0.25f delay before stopping animations
-		FTimerHandle TimerHandle;
-		const auto StopAnim = [this](){ GetMesh()->bPauseAnims = true; };
-		GetWorldTimerManager().SetTimer(TimerHandle, StopAnim, DeathMontage->GetPlayLength() - 0.25f, false);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("AComNonPlayerCharacter: Death montage has not been set"));
-	}
-
-	if (UItmItemGeneratorSubsystem* ItemGenerator = GetGameInstance()->GetSubsystem<UItmItemGeneratorSubsystem>())
-		ItemGenerator->TrySpawnItem(GetActorLocation());
+	TrySpawnItem();
 	
-	// Destroy after delay or ragdoll
-	SetLifeSpan(LifeSpawn);
+	PlayDeathMontage();
+	
+	SetLifeSpan(DeathDelay);
 }
 
+void AComNonPlayerCharacter::PlayDeathMontage()
+{    
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (!AnimInstance || !DeathMontage)
+		return;
+    
+	AnimInstance->Montage_Play(DeathMontage);
+    
+	// Stop animation after death montage to avoid character going back on feet with animation blueprint
+	// TODO: Find cleaner way to stop animation without 0.25f delay. Fix death montage.
+	FTimerHandle TimerHandle;
+	auto StopAnim = [this]() { GetMesh()->bPauseAnims = true; };
+	GetWorldTimerManager().SetTimer(TimerHandle,StopAnim ,DeathMontage->GetPlayLength() - 0.25f,false);
+}
+
+void AComNonPlayerCharacter::TrySpawnItem()
+{	
+	if (UItmItemGeneratorSubsystem* ItemGenerator = GetGameInstance()->GetSubsystem<UItmItemGeneratorSubsystem>())
+		ItemGenerator->TrySpawnItem(GetActorLocation());
+}

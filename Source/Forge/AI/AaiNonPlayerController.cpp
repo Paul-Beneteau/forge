@@ -1,9 +1,6 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "AaiNonPlayerController.h"
 
-#include "AaiAiConfigData.h"
+#include "AaiAiConfig.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/Character.h"
@@ -28,8 +25,6 @@ AAaiNonPlayerController::AAaiNonPlayerController(const FObjectInitializer& Objec
 	PerceptionComp->ConfigureSense(*Sight);
 	PerceptionComp->SetDominantSense(Sight->GetSenseImplementation());
 	PerceptionComp->OnTargetPerceptionUpdated.AddDynamic(this, &AAaiNonPlayerController::OnTargetPerceptionUpdated);
-
-	//bAllowStrafe = true;
 }
 
 void AAaiNonPlayerController::BeginPlay()
@@ -37,30 +32,30 @@ void AAaiNonPlayerController::BeginPlay()
 	Super::BeginPlay();
 	
 	// Set AI Config Data
-	check(AiConfigData);
+	check(AiConfig && AiConfig->IsValid());
 	
-	Sight->SightRadius = AiConfigData->SightRadius;
-	Sight->LoseSightRadius = AiConfigData->LoseSightRadius;
+	Sight->SightRadius = AiConfig->SightRadius;
+	Sight->LoseSightRadius = AiConfig->LoseSightRadius;
 
 	PerceptionComp->RequestStimuliListenerUpdate();
 
 	// Set Actor as Friendly for perception
 	SetGenericTeamId(FGenericTeamId(1));
 	
-	if (UseBlackboard(BehaviorTree->BlackboardAsset, BlackboardComp))
+	if (UseBlackboard(AiConfig->BehaviorTree->BlackboardAsset, BlackboardComp))
 	{
-		RunBehaviorTree(BehaviorTree);
+		RunBehaviorTree(AiConfig->BehaviorTree);
 		
-		BlackboardComp->SetValueAsFloat(AiConfigData->AttackRangeKeyName, AiConfigData->AttackRange);
+		BlackboardComp->SetValueAsFloat(AiConfig->AttackRangeKeyName, AiConfig->AttackRange);
 
 		// Generate donuts for the range query move to location with a circle radius little less than the attack range.
 		// Otherwise, NonPlayerCharacter would stop right before the location (because of move to acceptance radius) and
 		// not be in range to attack target.
-		check(AiConfigData->AttackRange - 50.f > 0.f);
-		BlackboardComp->SetValueAsFloat(AiConfigData->RangeQueryCircleRadiusKeyName, AiConfigData->AttackRange - 50.f);
+		check(AiConfig->AttackRange - 50.f > 0.f);
+		BlackboardComp->SetValueAsFloat(AiConfig->RangeQueryCircleRadiusKeyName, AiConfig->AttackRange - 50.f);
 		
 		// Set character as melee character if his range his below 200. It will make behavior tree move to target melee range
-		BlackboardComp->SetValueAsBool(AiConfigData->IsMeleeCharacterKeyName, AiConfigData->AttackRange <= 200.f);
+		BlackboardComp->SetValueAsBool(AiConfig->IsMeleeCharacterKeyName, AiConfig->AttackRange <= 200.f);
 		
 	}
 }
@@ -69,7 +64,7 @@ void AAaiNonPlayerController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 
-	if (ACharacter* PossessedCharacter { CastChecked<ACharacter>(InPawn) })
+	if (ACharacter* PossessedCharacter = CastChecked<ACharacter>(InPawn))
 	{
 		if (UCharacterMovementComponent* MovementComp = PossessedCharacter->GetCharacterMovement())
 		{			
@@ -78,11 +73,11 @@ void AAaiNonPlayerController::OnPossess(APawn* InPawn)
 			MovementComp->bUseControllerDesiredRotation = true;
 			MovementComp->RotationRate = FRotator(0.f, 720.f, 0.f);
 
-			MovementComp->BrakingDecelerationWalking = 0.f;  // default ≈ 2048, lower = smoother stops
+			MovementComp->BrakingDecelerationWalking = 0.f;
 			MovementComp->BrakingFrictionFactor = 0.f;
 		}
 
-		if (UCrowdFollowingComponent* CrowdFollowingComp { FindComponentByClass<UCrowdFollowingComponent>() })
+		if (UCrowdFollowingComponent* CrowdFollowingComp = FindComponentByClass<UCrowdFollowingComponent>())
 		{
 			CrowdFollowingComp->SetCrowdSeparation(true);
 			CrowdFollowingComp->SetCrowdSeparationWeight(80.0f);
@@ -92,50 +87,41 @@ void AAaiNonPlayerController::OnPossess(APawn* InPawn)
 		}
 	}
 
-	if (UseBlackboard(BehaviorTree->BlackboardAsset, BlackboardComp))
-		BlackboardComp->SetValueAsVector(AiConfigData->SpawnLocationKeyName, GetPawn()->GetActorLocation());
+	if (UseBlackboard(AiConfig->BehaviorTree->BlackboardAsset, BlackboardComp))
+		BlackboardComp->SetValueAsVector(AiConfig->SpawnLocationKeyName, GetPawn()->GetActorLocation());
 }
 
 void AAaiNonPlayerController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {
 	if (!Actor || !BlackboardComp)
-	{
 		return;
-	}
 
-	// If target is in sight range
+	// Set target if target is in sight range
 	if (Stimulus.WasSuccessfullySensed())
-	{
-		
-		BlackboardComp->SetValueAsObject(AiConfigData->TargetActorKeyName, Actor);
+	{		
+		BlackboardComp->SetValueAsObject(AiConfig->TargetActorKeyName, Actor);
 	}
 	else
 	{
-		BlackboardComp->ClearValue(AiConfigData->TargetActorKeyName);
+		BlackboardComp->ClearValue(AiConfig->TargetActorKeyName);
 		StopMovement();
 	}
 }
 
 ETeamAttitude::Type AAaiNonPlayerController::GetTeamAttitudeTowards(const AActor& Other) const
 {
-	const APawn* OtherPawn { Cast<APawn>(&Other) };
+	const APawn* OtherPawn = Cast<APawn>(&Other);
 	
 	if (!OtherPawn)
-	{
 		return ETeamAttitude::Neutral;
-	}
 
-	const IGenericTeamAgentInterface* OtherTeamAgent { Cast<IGenericTeamAgentInterface>(OtherPawn->GetController()) };
+	const IGenericTeamAgentInterface* OtherTeamAgent = Cast<IGenericTeamAgentInterface>(OtherPawn->GetController());
 	
 	if (!OtherTeamAgent)
-	{
 		return ETeamAttitude::Neutral;
-	}
 
 	if (OtherTeamAgent->GetGenericTeamId() == GetGenericTeamId())
-	{
 		return ETeamAttitude::Friendly;
-	}
 
 	return ETeamAttitude::Hostile;
 }

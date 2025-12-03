@@ -23,24 +23,21 @@ const FGameplayTagContainer& UComGameplayAbility::GetAssetTagsBP() const
 
 float UComGameplayAbility::GetFinalDamage() const
 {
-	float Damage { 0.0f };
-	UGameplayEffect* GameplayEffect { GameplayEffectClass->GetDefaultObject<UGameplayEffect>() };
+	float Damage = 0.0f;
+	UGameplayEffect* GameplayEffect = GameplayEffectClass->GetDefaultObject<UGameplayEffect>();
 
-	// For every modifier
+	// sum modifier magnitude of every GameplayEffect damage modifiers 
 	for (const FGameplayModifierInfo& Mod : GameplayEffect->Modifiers)
 	{
-		// If the modifier is applied to the damage attribute
 		if (Mod.Attribute == UComCombatAttributeSet::GetDamageAttribute())
 		{			
 			FGameplayEffectContextHandle EffectHandle = GetAbilitySystemComponentFromActorInfo()->MakeEffectContext();
 			EffectHandle.SetAbility(this);	
 			FGameplayEffectSpec EffectSpec(GameplayEffect, EffectHandle, 1.f);
 
-			// Get modifier magnitude which is the ability damage
+			// Get modifier magnitude which represent the ability damage
 			if (UComAbilityDamageCalculation* AbilityDamage = Mod.ModifierMagnitude.GetCustomMagnitudeCalculationClass()->GetDefaultObject<UComAbilityDamageCalculation>())
-			{
 				Damage = AbilityDamage->CalculateBaseMagnitude_Implementation(EffectSpec);
-			}
 		}
 	}
 

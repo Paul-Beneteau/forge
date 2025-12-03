@@ -29,15 +29,15 @@ public:
 	
 	void Refresh(const FItmItemInstance& NewItem);
 	
-protected:	
+protected:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-	TObjectPtr<UImage> SlotImage { nullptr };
+	TObjectPtr<UImage> SlotImage = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-	TObjectPtr<UTextBlock> EquipmentLabel { nullptr };
+	TObjectPtr<UTextBlock> EquipmentLabel = nullptr;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EItmEquipmentSlot EquipmentSlotType { EItmEquipmentSlot::None };
+	EItmEquipmentSlot EquipmentSlotType = EItmEquipmentSlot::None;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FSlateBrush DefaultSlotBrush;

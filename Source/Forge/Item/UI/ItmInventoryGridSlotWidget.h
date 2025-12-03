@@ -32,25 +32,25 @@ public:
 	
 protected:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-	TObjectPtr<UImage> SlotImage { nullptr };
+	TObjectPtr<UImage> SlotImage = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-	TObjectPtr<UImage> BottomBorderImage { nullptr };
+	TObjectPtr<UImage> BottomBorderImage = nullptr;
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-	TObjectPtr<UImage> TopBorderImage { nullptr };
+	TObjectPtr<UImage> TopBorderImage = nullptr;
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-	TObjectPtr<UImage> LeftBorderImage { nullptr };
+	TObjectPtr<UImage> LeftBorderImage = nullptr;
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-	TObjectPtr<UImage> RightBorderImage { nullptr };
+	TObjectPtr<UImage> RightBorderImage = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-	TObjectPtr<UTextBlock> QuantityLabel { nullptr };
+	TObjectPtr<UTextBlock> QuantityLabel = nullptr;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FSlateBrush DefaultSlotBrush;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	int32 SlotIndex { -1 };
+	int32 SlotIndex = -1;
 	
 	virtual void NativeConstruct() override;
 

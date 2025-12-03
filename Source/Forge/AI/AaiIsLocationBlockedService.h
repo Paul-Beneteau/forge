@@ -4,7 +4,7 @@
 #include "BehaviorTree/BTService.h"
 #include "AaiIsLocationBlockedService.generated.h"
 
-// Check if the move to location is blocked
+// Update blackboard key indicating if the location from "AiConfig->MoveToLocationKeyName" is blocked
 UCLASS()
 class FORGE_API UAaiIsLocationBlockedService : public UBTService
 {

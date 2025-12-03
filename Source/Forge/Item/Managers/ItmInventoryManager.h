@@ -30,13 +30,13 @@ public:
 	
 protected:
 	UPROPERTY()
-	TObjectPtr<APlayerController> PlayerController { nullptr };
+	TObjectPtr<APlayerController> PlayerController = nullptr;
 	UPROPERTY()
-	TObjectPtr<UItmInventoryComponent> InventoryComp { nullptr };
+	TObjectPtr<UItmInventoryComponent> InventoryComp = nullptr;
 	UPROPERTY()
-	TObjectPtr<UItmEquipmentComponent> EquipmentComp { nullptr };
+	TObjectPtr<UItmEquipmentComponent> EquipmentComp = nullptr;
 	UPROPERTY()
-	TObjectPtr<UItmInventoryRootWidget> InventoryWidget { nullptr };
+	TObjectPtr<UItmInventoryRootWidget> InventoryWidget = nullptr;
 	
 	UFUNCTION()
 	void HandleGridSlotClicked(int32 SlotIndex);

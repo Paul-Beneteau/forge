@@ -1,24 +1,23 @@
 #include "AaiMoveToTask.h"
 
-#include "AaiAiConfigData.h"
+#include "AaiAiConfig.h"
 #include "AaiNonPlayerController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Navigation/PathFollowingComponent.h"
 
 UAaiMoveToTask::UAaiMoveToTask()
 {
-	// Create task instance for each NonPlayerCharacter so that class member like CachedMoveRequest are not shared with
-	// every NonPlayerCharacter. 
+	// Create task instance for each NonPlayerCharacter so that class member like CachedMoveRequest are not shared with every NonPlayerCharacter. 
 	bCreateNodeInstance = true;
 }
 
 EBTNodeResult::Type UAaiMoveToTask::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	CachedBehaviorTree = &OwnerComp;	
-	CachedController = CastChecked<AAaiNonPlayerController>(OwnerComp.GetAIOwner());
+	CachedController = CastChecked<AAaiNonPlayerController>(OwnerComp.GetAIOwner());	
+	check(CachedController->AiConfig && CachedController->AiConfig->IsValid() && OwnerComp.GetBlackboardComponent());
 	
-	check(CachedController->AiConfigData && OwnerComp.GetBlackboardComponent());
-	FVector MoveToLocation { OwnerComp.GetBlackboardComponent()->GetValueAsVector(CachedController->AiConfigData->MoveToLocationKeyName) };
+	FVector MoveToLocation = OwnerComp.GetBlackboardComponent()->GetValueAsVector(CachedController->AiConfig->MoveToLocationKeyName);
 	
 	FAIMoveRequest MoveRequest;
 	MoveRequest.SetGoalLocation(MoveToLocation);	
@@ -29,19 +28,21 @@ EBTNodeResult::Type UAaiMoveToTask::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 	MoveRequest.SetAllowPartialPath(true);
 	MoveRequest.SetCanStrafe(true);
 	
-	UPathFollowingComponent* PathComp { CachedController->GetPathFollowingComponent() };
-	check(PathComp);
+	UPathFollowingComponent* PathComp = CachedController->GetPathFollowingComponent();
+	if (!PathComp)
+	{
+		UE_LOG(LogTemp, Error, TEXT("UAaiMoveToTask: AI Character doesn't have path following component "));
+		return EBTNodeResult::Failed;
+	}
 
-	// Remove callback binding if move to is called befoe the previous move to task has finished
+	// Remove callback binding if move to is called before the previous move to task has finished
 	if (OnMoveCompletedHandle.IsValid())
 	{
 		PathComp->OnRequestFinished.Remove(OnMoveCompletedHandle);
 		OnMoveCompletedHandle.Reset();
 	}
 
-	// Start moving
-	FPathFollowingRequestResult MoveToResult { CachedController->MoveTo(MoveRequest) };
-	
+	FPathFollowingRequestResult MoveToResult = CachedController->MoveTo(MoveRequest);	
 	if (MoveToResult.Code == EPathFollowingRequestResult::Failed)
 	{
 		UE_LOG(LogTemp, Error, TEXT("UAaiMoveToTask: fail to move- no valid path"));
@@ -58,14 +59,11 @@ EBTNodeResult::Type UAaiMoveToTask::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 
 void UAaiMoveToTask::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
 {
-	// If the requested move that ended is not the current requested move, don't end the task as the requested move path
-	// has been updated
+	// If the requested move that ended is not the current requested move, don't end the task as the requested move path has been updated
 	if (RequestID != CachedMoveRequest)
-	{
 		return;
-	}
 	
-	if (UPathFollowingComponent* PathComp { CachedController->GetPathFollowingComponent() })
+	if (UPathFollowingComponent* PathComp = CachedController->GetPathFollowingComponent())
 	{
 		// Remove Callback bind to OnRequestFinished
 		PathComp->OnRequestFinished.Remove(OnMoveCompletedHandle);

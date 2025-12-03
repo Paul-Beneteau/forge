@@ -6,6 +6,7 @@
 
 class UGameplayEffect;
 
+// Handle AI character attack logic
 UCLASS()
 class FORGE_API UAaiMeleeAttackNotify : public UAnimNotify
 {
@@ -13,13 +14,4 @@ class FORGE_API UAaiMeleeAttackNotify : public UAnimNotify
 	
 public:
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference) override;
-
-	UPROPERTY(EditAnywhere, Category = "Attack")
-	float AttackRange = 100.0f;
-
-	UPROPERTY(EditAnywhere, Category = "Attack")
-	float AttackRadius = 50.0f;
-
-	UPROPERTY(EditAnywhere, Category = "Attack")
-	TSubclassOf<UGameplayEffect> DamageEffect;
 };

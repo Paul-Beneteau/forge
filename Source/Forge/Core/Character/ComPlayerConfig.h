@@ -10,6 +10,7 @@ class UInputMappingContext;
 class UInputAction;
 class UGameplayAbility;
 
+// Binds input with a gameplay ability
 USTRUCT()
 struct FComAbilityInput
 {
@@ -22,6 +23,7 @@ struct FComAbilityInput
 	TSubclassOf<UGameplayAbility> Ability;
 };
 
+// Player character configurations
 UCLASS()
 class FORGE_API UComPlayerConfig : public UDataAsset
 {

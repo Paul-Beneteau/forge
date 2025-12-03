@@ -91,19 +91,19 @@ FMapGraphCoord UMapGraphGenerator::GenerateMainPathStart() const
 	{
 	// Top Edge
 	case 0:
-		return FMapGraphCoord{0,FMath::RandRange(0, Columns - 1)};
-		
+		return FMapGraphCoord(0, FMath::RandRange(0, Columns - 1));
+
 	// Bottom Edge
 	case 1:
-		return FMapGraphCoord{Rows - 1,FMath::RandRange(0, Columns - 1)};
+		return FMapGraphCoord(Rows - 1, FMath::RandRange(0, Columns - 1));
 
 	// Left Edge
 	case 2:
-		return FMapGraphCoord{FMath::RandRange(0, Rows - 1), 0};
-		
+		return FMapGraphCoord(FMath::RandRange(0, Rows - 1), 0);
+
 	// Right Edge
 	case 3:
-		return FMapGraphCoord{FMath::RandRange(0, Rows - 1), Columns - 1};
+		return FMapGraphCoord(FMath::RandRange(0, Rows - 1), Columns - 1);
 		
 	default:
 		return FMapGraphCoord::None;

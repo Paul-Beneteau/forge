@@ -1,6 +1,6 @@
 #include "AaiIsLocationBlockedService.h"
 
-#include "AaiAiConfigData.h"
+#include "AaiAiConfig.h"
 #include "AaiNonPlayerController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Engine/OverlapResult.h"
@@ -11,17 +11,10 @@ void UAaiIsLocationBlockedService::TickNode(UBehaviorTreeComponent& OwnerComp, u
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
 
 	AAaiNonPlayerController* Controller = CastChecked<AAaiNonPlayerController>(OwnerComp.GetAIOwner());
-	check(Controller->AiConfigData);
+	check(Controller->AiConfig && Controller->AiConfig->IsValid());
 	
-	AActor* Target { Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(Controller->AiConfigData->TargetActorKeyName)) };
-	
-	if (!Target)
-	{
-		return;
-	}
-
-	check(OwnerComp.GetAIOwner());
-	APawn* Pawn { OwnerComp.GetAIOwner()->GetPawn() };
+	AActor* Target = CastChecked<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(Controller->AiConfig->TargetActorKeyName));
+	APawn* Pawn = OwnerComp.GetAIOwner()->GetPawn();
 	
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(Pawn);
@@ -30,9 +23,8 @@ void UAaiIsLocationBlockedService::TickNode(UBehaviorTreeComponent& OwnerComp, u
 	
 	TArray<FOverlapResult> Overlaps;
 	
-	FVector MoveToLocation { OwnerComp.GetBlackboardComponent()->GetValueAsVector(Controller->AiConfigData->MoveToLocationKeyName) };
+	FVector MoveToLocation = OwnerComp.GetBlackboardComponent()->GetValueAsVector(Controller->AiConfig->MoveToLocationKeyName);
 
-	// TODO parametrize sphere radius
 	// Sphere sweep to check if the location is blocked
 	GetWorld()->OverlapMultiByChannel(Overlaps, MoveToLocation,FQuat::Identity,ECC_Pawn,	FCollisionShape::MakeSphere(25.f), Params);
 
@@ -48,6 +40,5 @@ void UAaiIsLocationBlockedService::TickNode(UBehaviorTreeComponent& OwnerComp, u
 		}
 	}
 
-	// Update the blackboard key associated with the attack location 
-	OwnerComp.GetBlackboardComponent()->SetValueAsBool(Controller->AiConfigData->IsMoveToLocationBlockedKeyName, bIsBlocked);
+	OwnerComp.GetBlackboardComponent()->SetValueAsBool(Controller->AiConfig->IsMoveToLocationBlockedKeyName, bIsBlocked);
 }

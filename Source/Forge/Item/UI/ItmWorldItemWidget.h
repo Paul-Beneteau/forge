@@ -34,12 +34,12 @@ public:
 	
 protected:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-	TObjectPtr<UTextBlock> NameLabelWidget { nullptr };
+	TObjectPtr<UTextBlock> NameLabelWidget = nullptr;
 
 	UPROPERTY()
-	TObjectPtr<UItmItemTooltipWidget> ItemTooltipWidget { nullptr };
+	TObjectPtr<UItmItemTooltipWidget> ItemTooltipWidget = nullptr;
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UItmItemTooltipWidget> ItemTooltipWidgetClass { nullptr };
+	TSubclassOf<UItmItemTooltipWidget> ItemTooltipWidgetClass = nullptr;
 
 	virtual void NativeConstruct() override;
 	

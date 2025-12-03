@@ -15,9 +15,9 @@ class FORGE_API UMapGeneratorConfig : public UDataAsset
 
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "Graph Generation")
-	int32 Rows { 7 };
+	int32 Rows = 7;
 	UPROPERTY(EditDefaultsOnly, Category = "Graph Generation")
-	int32 Columns { 7 };
+	int32 Columns = 7;
 
 	// Configuration for layout generation (layout type, segment lengths, themes, etc.)
 	UPROPERTY(EditDefaultsOnly, Category = "Graph Generation")
@@ -25,7 +25,7 @@ public:
 	
 	// maximum number of retries if the layout generation fails
 	UPROPERTY(EditDefaultsOnly, Category = "Graph Generation")
-	int32 MaxLayoutGenerationRetries { 25 };
+	int32 MaxLayoutGenerationRetries = 25;
 
 	// Tile templates available for selection.
 	UPROPERTY(EditDefaultsOnly, Category = "Tile Selection")

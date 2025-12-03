@@ -52,7 +52,7 @@ struct FItmItemAttribute
 	TEnumAsByte<EGameplayModOp::Type> ModifierOp = EGameplayModOp::Additive;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float Magnitude { 0.f };
+	float Magnitude = 0.f;
 };
 
 // Attributes templates used to generate attributes of an instanced item
@@ -68,10 +68,10 @@ struct FItmItemAttributeTemplate
 	TEnumAsByte<EGameplayModOp::Type> ModifierOp = EGameplayModOp::Additive;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float MinMagnitude { 0.f };
-	
+	float MinMagnitude = 0.f;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float MaxMagnitude { 0.f };
+	float MaxMagnitude = 0.f;
 
 	// Generate an attribute from the template with a random magnitude between MinMagnitude and MaxMagnitude
 	FItmItemAttribute GenerateRandomAttribute()	{ return FItmItemAttribute(Attribute, ModifierOp, FMath::RandRange(MinMagnitude, MaxMagnitude)); }
@@ -84,13 +84,13 @@ struct FItmItemBase : public FTableRowBase
 	GENERATED_BODY()
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FName Name { "NAME_None" };
+	FName Name = "NAME_None";
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	EItmItemType ItemType { EItmItemType::None };
+	EItmItemType ItemType = EItmItemType::None;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TObjectPtr<UTexture2D> Icon { nullptr };
+	TObjectPtr<UTexture2D> Icon = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TArray<FItmItemAttributeTemplate> AttributeTemplates;

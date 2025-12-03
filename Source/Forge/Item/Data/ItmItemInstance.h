@@ -11,7 +11,7 @@ struct FItmItemInstance
 	GENERATED_BODY()
 
 	UPROPERTY(BlueprintReadOnly)
-	FGuid Id { FGuid::NewGuid() };
+	FGuid Id = FGuid::NewGuid();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FItmItemBase ItemBase;

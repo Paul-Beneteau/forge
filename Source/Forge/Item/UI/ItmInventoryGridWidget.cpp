@@ -19,8 +19,8 @@ void UItmInventoryGridWidget::NativeConstruct()
 		{
 			UItmInventoryGridSlotWidget* GridSlotWidget = CreateWidget<UItmInventoryGridSlotWidget>(GetWorld(), GridSlotClass);
 
-			const bool bIsLastRow { Row == RowCount - 1 };			
-			const bool bIsLastColumn { Column == ColumnCount - 1 };
+			const bool bIsLastRow = Row == RowCount - 1;
+			const bool bIsLastColumn = Column == ColumnCount - 1;
 
 			// Hide the bottom/right border if this is not the last row/column to avoid stacking border with neighbor slot widgets
 			GridSlotWidget->Initialize( Row * ColumnCount + Column);	

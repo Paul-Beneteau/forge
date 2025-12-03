@@ -11,6 +11,13 @@ GAMEPLAYATTRIBUTE_VALUE_GETTER(PropertyName) \
 GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
 GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
 
+// Attribute set for damage modifiers which can be divided in 3 category
+// 1. Flat damage - Added directly to base damage (e.g., +15 added fire damage)
+// 2. Additive modifiers - Summed percentages applied together (e.g., +20% fire + +30% projectile = +50% total)
+// 3. Multiplicative modifiers - Applied as separate multipliers (e.g., 30% more damage, 20% more spell damage: damage is multiply by 30% then by 20% again)
+//
+// Final damage formula: (BaseDamage + FlatDamage) * (1 + AdditiveTotal) * MultiplicativeTotal
+// Example: (100 base + 15 flat) * (1 + 0.50 additive) * (1.30 * 1.20 multiplicative) = 268 damage
 UCLASS()
 class FORGE_API UComDamageModifierAttributeSet : public UAttributeSet
 {

@@ -50,7 +50,7 @@ void UComCombatAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModC
 	Super::PostGameplayEffectExecute(Data);
 
 	const FGameplayEffectContextHandle& EffectContext = Data.EffectSpec.GetEffectContext();
-	AActor* Instigator { EffectContext.GetOriginalInstigator() };
+	AActor* Instigator = EffectContext.GetOriginalInstigator();
 
 	if (Data.EvaluatedData.Attribute == GetDamageAttribute())
 	{

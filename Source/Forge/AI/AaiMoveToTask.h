@@ -7,7 +7,7 @@
 class AAaiNonPlayerController;
 struct FPathFollowingResult;
 
-// Task to move to the location given by the blackboard key "AttackLocation"
+// Task to move to the location given by the blackboard key "AiConfig->MoveToLocationKeyName"
 UCLASS()
 class FORGE_API UAaiMoveToTask : public UBTTaskNode
 {
@@ -19,14 +19,12 @@ public:
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
 protected:
-	// Cached data use by OnMoveCompleted callback
 	UPROPERTY()
 	TObjectPtr<UBehaviorTreeComponent> CachedBehaviorTree;	
 	UPROPERTY()
 	TObjectPtr<AAaiNonPlayerController> CachedController;
 	FAIRequestID CachedMoveRequest;
 	
-	// Handle that bind OnMoveCompleted function
 	FDelegateHandle OnMoveCompletedHandle;
 
 	// Callback when move to task is completed.
