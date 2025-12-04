@@ -12,17 +12,22 @@ float UComAbilityDamageCalculation::CalculateBaseMagnitude_Implementation(const 
 	
 	const IAbilitySystemInterface* Instigator = CastChecked<IAbilitySystemInterface>(Spec.GetEffectContext().GetInstigator());	
 	const UAbilitySystemComponent* AbilitySystemComp = CastChecked<UAbilitySystemComponent>(Instigator->GetAbilitySystemComponent());	
-	const UComDamageModifierAttributeSet* DamageModifierSet = CastChecked<UComDamageModifierAttributeSet>(
+	const UComDamageModifierAttributeSet* DamageModifierSet = Cast<UComDamageModifierAttributeSet>(
 		AbilitySystemComp->GetAttributeSet(UComDamageModifierAttributeSet::StaticClass()));
-	
-	float FlatDamage = ComputeFlatDamage(DamageModifierSet, Ability);
-	float AdditiveDamage = ComputeAdditiveDamage(DamageModifierSet, Ability);
-	float MultiplicativeDamage = ComputeMultiplicativeDamage(DamageModifierSet, Ability);
 
-	const float Damage = (Ability->GetBaseDamage() + FlatDamage) * AdditiveDamage * MultiplicativeDamage;
+	float AbilityDamage = Ability->GetBaseDamage();
+	
+	if (DamageModifierSet)
+	{
+		float FlatDamage = ComputeFlatDamage(DamageModifierSet, Ability);
+		float AdditiveDamage = ComputeAdditiveDamage(DamageModifierSet, Ability);
+		float MultiplicativeDamage = ComputeMultiplicativeDamage(DamageModifierSet, Ability);
+
+		AbilityDamage = (AbilityDamage + FlatDamage) * AdditiveDamage * MultiplicativeDamage;
+	}
 	
 	// Remove decimals
-	return FMath::RoundToInt32(Damage);
+	return FMath::RoundToInt32(AbilityDamage);
 }
 
 float UComAbilityDamageCalculation::ComputeFlatDamage(const UAttributeSet* AttributeSet, const UComGameplayAbility* Ability) const
@@ -80,7 +85,7 @@ float UComAbilityDamageCalculation::ComputeMultiplicativeDamage(const UAttribute
 }
 
 bool UComAbilityDamageCalculation::CanApplyModifier(const UComGameplayAbility* Ability, const FGameplayTag& ModifierRequiredTag) const
-{    
+{	
 	if (ModifierRequiredTag == FGameplayTag::EmptyTag)
 		return true;
     

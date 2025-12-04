@@ -4,6 +4,7 @@
 #include "GameFramework/Actor.h"
 #include "ComBaseProjectile.generated.h"
 
+class UCapsuleComponent;
 class UGameplayAbility;
 struct FGameplayTagContainer;
 class UGameplayEffect;
@@ -30,9 +31,7 @@ public:
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
-	TObjectPtr<USphereComponent> RootComp;	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
-	TObjectPtr<UStaticMeshComponent> MeshComp;		
+	TObjectPtr<UCapsuleComponent> CollisionComp;	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UProjectileMovementComponent> MovementComp;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")

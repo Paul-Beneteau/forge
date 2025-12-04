@@ -31,7 +31,7 @@ protected:
 	TObjectPtr<UAIPerceptionComponent> PerceptionComp;
 	UPROPERTY()
 	TObjectPtr<UAISenseConfig_Sight> Sight;
-
+	
 	UFUNCTION()
 	void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
 	

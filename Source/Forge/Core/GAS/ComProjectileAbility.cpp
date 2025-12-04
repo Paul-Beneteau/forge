@@ -18,7 +18,7 @@ void UComProjectileAbility::ActivateAbility(const FGameplayAbilitySpecHandle Han
 
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	const AComPlayerCharacter* Character = CastChecked<AComPlayerCharacter>(GetAvatarActorFromActorInfo());
+	const ACharacter* Character = Cast<ACharacter>(GetAvatarActorFromActorInfo());
 
 	// Spawn a projectile in the direction of the cursor click
 	if (APlayerController* PlayerController = Cast<APlayerController>(Character->GetController()))
@@ -27,8 +27,7 @@ void UComProjectileAbility::ActivateAbility(const FGameplayAbilitySpecHandle Han
 		
 		if (PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_Pawn, true, Hit))
 		{			
-			// Clear bOrientRotationToMovement so that character can rotate. Best way to rotate would be to use
-			// animation but this is not the focus of the project
+			// Clear bOrientRotationToMovement so that character can rotate. Best way to rotate would be to use animation
 			Character->GetCharacterMovement()->bOrientRotationToMovement = false;
 
 			const FRotator CharacterRotation = (Hit.Location - GetAvatarActorFromActorInfo()->GetActorLocation()).Rotation();
@@ -39,6 +38,12 @@ void UComProjectileAbility::ActivateAbility(const FGameplayAbilitySpecHandle Han
 			// Spawn projectile. Loop to wait until character finish rotating
 			GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UComProjectileAbility::OnCharacterRotated, 0.1f, true);
 		}
+	} // AI character abilities doesn't need to rotate before. TODO: Find a clean way to handle this
+	else if (AController* AiController = Cast<AController>(Character->GetController()))
+	{				
+		SpawnProjectiles(1);
+	
+		EndAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), true, false);		
 	}
 }
 
@@ -65,14 +70,14 @@ void UComProjectileAbility::OnCharacterRotated()
 void UComProjectileAbility::SpawnProjectiles(int32 ProjectilesCount)
 {
 
-	AComPlayerCharacter* Character = CastChecked<AComPlayerCharacter>(GetAvatarActorFromActorInfo());
+	ACharacter* Character = CastChecked<ACharacter>(GetAvatarActorFromActorInfo());
 
 	TArray<FRotator> ProjectileRotations = GetProjectileRotations(ProjectilesCount);
 
 	for (FRotator ProjectileRotation : ProjectileRotations)
 	{		
-		FVector ProjectileLocation = Character->GetMesh()->GetSocketLocation("BowEmitterSocket");
-
+		FVector ProjectileLocation = Character->GetMesh()->GetSocketLocation(SpawnSocketName);
+		
 		AComBaseProjectile* Projectile = GetWorld()->SpawnActorDeferred<AComBaseProjectile>(ProjectileClass,
 			FTransform(ProjectileRotation, ProjectileLocation),nullptr, Character, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
@@ -95,7 +100,7 @@ TArray<FRotator> UComProjectileAbility::GetProjectileRotations(int32 Projectiles
 {
 	check (ProjectilesCount > 0);
 
-	const AComPlayerCharacter* Character = CastChecked<AComPlayerCharacter>(GetAvatarActorFromActorInfo());
+	const ACharacter* Character = CastChecked<ACharacter>(GetAvatarActorFromActorInfo());
 	
 	TArray<FRotator> ProjectileRotations;
 

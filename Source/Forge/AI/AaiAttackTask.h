@@ -12,4 +12,14 @@ class FORGE_API UAaiAttackTask : public UBTTaskNode
 
 public:
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+
+protected:
+	UPROPERTY()
+	TObjectPtr<ACharacter> CachedCharacter;
+	
+	FTimerHandle TimerHandle;
+
+	FRotator TargetRotation;  // Add this
+    
+	void OnCharacterRotating();
 };

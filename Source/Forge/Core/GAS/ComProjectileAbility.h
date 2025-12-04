@@ -20,6 +20,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Ability")
 	TSubclassOf<AActor> ProjectileClass;
 
+	UPROPERTY(EditAnywhere, Category = "Projectile")
+	FName SpawnSocketName;
+	
 	FTimerHandle TimerHandle;
 
 	// Spread between 2 projectiles when there is less than 12 projectiles

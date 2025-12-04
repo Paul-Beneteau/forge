@@ -1,7 +1,9 @@
 #include "ComBaseProjectile.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "GameplayEffect.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -11,15 +13,11 @@
 
 AComBaseProjectile::AComBaseProjectile()
 {
-	RootComp = CreateDefaultSubobject<USphereComponent>("RootComp");
-	RootComponent = RootComp;
-	RootComp->SetSphereRadius(0.0f);
+	CollisionComp = CreateDefaultSubobject<UCapsuleComponent>("CollisionComp");
+	RootComponent = CollisionComp;
 	
-	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>("MeshComp");
-	MeshComp->SetupAttachment(RootComp);
-		
 	EffectComp = CreateDefaultSubobject<UParticleSystemComponent>("EffectComp");
-	EffectComp->SetupAttachment(RootComp);
+	EffectComp->SetupAttachment(RootComponent);
 	
 	MovementComp = CreateDefaultSubobject<UProjectileMovementComponent>("MovementComp");
 	MovementComp->InitialSpeed = 1900.0f;
@@ -38,7 +36,8 @@ void AComBaseProjectile::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	MeshComp->OnComponentBeginOverlap.AddDynamic(this, &AComBaseProjectile::OnActorOverlap);
+	//MeshComp->OnComponentBeginOverlap.AddDynamic(this, &AComBaseProjectile::OnActorOverlap);
+	CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &AComBaseProjectile::OnActorOverlap);
 }
 
 void AComBaseProjectile::BeginPlay()
@@ -56,7 +55,9 @@ void AComBaseProjectile::BeginPlay()
 // Apply the gameplay effect to the actor hit
 void AComBaseProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
+{	
+	UE_LOG(LogTemp, Warning, TEXT("AComBaseProjectile::OnActorOverlap"));
+	
 	if (OtherActor == GetInstigator() || OtherActor == this)
 		return;
 
@@ -65,29 +66,26 @@ void AComBaseProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent
 	else
 		UE_LOG(LogTemp, Warning, TEXT("AComBaseProjectile: projectile HitActorEffect is null"));
 
-	const AComPlayerCharacter* PlayerCharacter = Cast<AComPlayerCharacter>(GetInstigator());
-	const AComNonPlayerCharacter* NonPlayerCharacter = Cast<AComNonPlayerCharacter>(OtherActor);
+	AActor* InstigatorActor = Cast<ACharacter>(GetInstigator());
+	AActor* TargetActor = Cast<ACharacter>(OtherActor);
 	
-	if (PlayerCharacter && NonPlayerCharacter)
-	{
-		UAbilitySystemComponent* TargetAbilitySystemComp = NonPlayerCharacter->GetAbilitySystemComponent();
-		check(TargetAbilitySystemComp);
-		UAbilitySystemComponent* SourceAbilitySystemComp = PlayerCharacter->GetAbilitySystemComponent();
-		check(SourceAbilitySystemComp);
-	
-		FGameplayEffectContextHandle EffectHandle = SourceAbilitySystemComp->MakeEffectContext();
-		EffectHandle.SetAbility(InstigatorAbility);
+	if (!InstigatorActor || !TargetActor)
+		return;
 
-		if (HitActorGameplayEffect)
-			SourceAbilitySystemComp->ApplyGameplayEffectToTarget(HitActorGameplayEffect->GetDefaultObject<UGameplayEffect>(),
-				TargetAbilitySystemComp, 1.0f, EffectHandle);
-		else
-			UE_LOG(LogTemp, Error, TEXT("AComBaseProjectile: HitActorGameplayEffect has not been set"));
-	}
+	UAbilitySystemComponent* TargetAbilitySystemComp = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
+	UAbilitySystemComponent* InstigatorAbilitySystemComp = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(InstigatorActor);
+	if (!TargetAbilitySystemComp || !InstigatorAbilitySystemComp)
+		return;
+	
+	FGameplayEffectContextHandle EffectHandle = InstigatorAbilitySystemComp->MakeEffectContext();
+	EffectHandle.SetAbility(InstigatorAbility);
+
+	if (HitActorGameplayEffect)
+		InstigatorAbilitySystemComp->ApplyGameplayEffectToTarget(HitActorGameplayEffect->GetDefaultObject<UGameplayEffect>(),
+		TargetAbilitySystemComp, 1.0f, EffectHandle);
 	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("AComBaseProjectile: Can't find instigator or target"));
-	}	
+		UE_LOG(LogTemp, Error, TEXT("AComBaseProjectile: HitActorGameplayEffect has not been set"));
+
 	
 	Destroy();
 }
