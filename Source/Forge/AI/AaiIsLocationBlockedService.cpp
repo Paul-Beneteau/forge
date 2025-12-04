@@ -13,7 +13,9 @@ void UAaiIsLocationBlockedService::TickNode(UBehaviorTreeComponent& OwnerComp, u
 	AAaiNonPlayerController* Controller = CastChecked<AAaiNonPlayerController>(OwnerComp.GetAIOwner());
 	check(Controller->AiConfig && Controller->AiConfig->IsValid());
 	
-	AActor* Target = CastChecked<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(Controller->AiConfig->TargetActorKeyName));
+	AActor* Target = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(Controller->AiConfig->TargetActorKeyName));
+	if (!Target)
+		return;
 	APawn* Pawn = OwnerComp.GetAIOwner()->GetPawn();
 	
 	FCollisionQueryParams Params;

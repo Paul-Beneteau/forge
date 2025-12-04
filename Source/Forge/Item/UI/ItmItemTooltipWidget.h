@@ -25,6 +25,11 @@ protected:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<UTextBlock> AttributesLabelWidget;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Name Color")
+	FSlateColor MagicItemColor;
+	UPROPERTY(EditDefaultsOnly, Category = "Name Color")
+	FSlateColor RareItemColor;
+	
 	virtual void NativeConstruct() override;
 
 	void SetAttributesLabel(const FItmItemInstance& Item);

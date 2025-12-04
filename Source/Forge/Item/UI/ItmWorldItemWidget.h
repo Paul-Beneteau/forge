@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Forge/Item/Data/ItmItemInstance.h"
 #include "ItmWorldItemWidget.generated.h"
 
 struct FItmItemInstance;
@@ -30,7 +31,7 @@ public:
 	
 	void Initialize(const FItmItemInstance& InItem);
 
-	void RefreshTooltip(const FItmItemInstance& Item);
+	void RefreshTooltip(const FItmItemInstance& InItem);
 	
 protected:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
@@ -41,6 +42,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UItmItemTooltipWidget> ItemTooltipWidgetClass = nullptr;
 
+	UPROPERTY(BlueprintReadOnly, Category="Item")
+	FItmItemInstance Item;
+	
 	virtual void NativeConstruct() override;
 	
 	virtual FReply NativeOnMouseButtonDown( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;

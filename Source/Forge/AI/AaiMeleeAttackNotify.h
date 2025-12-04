@@ -4,9 +4,7 @@
 #include "Animation/AnimNotifies/AnimNotify.h"
 #include "AaiMeleeAttackNotify.generated.h"
 
-class UGameplayEffect;
-
-// Handle AI character attack logic
+// Handle AI character melee attack logic
 UCLASS()
 class FORGE_API UAaiMeleeAttackNotify : public UAnimNotify
 {

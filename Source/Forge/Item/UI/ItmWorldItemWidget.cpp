@@ -10,10 +10,12 @@ void UItmWorldItemWidget::Initialize(const FItmItemInstance& InItem)
 	if (!InItem.IsValid())
 		return;
 	
+	Item = InItem;
+	
 	NameLabelWidget->SetText(FText::FromName(InItem.ItemBase.Name));
 }
 
-void UItmWorldItemWidget::RefreshTooltip(const FItmItemInstance& Item)
+void UItmWorldItemWidget::RefreshTooltip(const FItmItemInstance& InItem)
 {
 	const FVector2D WidgetPosition = GetTickSpaceGeometry().GetAbsolutePosition();
 	const FVector2D WidgetSize = GetTickSpaceGeometry().GetAbsoluteSize();
@@ -30,7 +32,7 @@ void UItmWorldItemWidget::RefreshTooltip(const FItmItemInstance& Item)
 	FVector2D Offset = FVector2D(0.f, 15.f);
 	ItemTooltipWidget->SetPositionInViewport(ViewportPosition + Offset, false);
 	
-	ItemTooltipWidget->Refresh(Item);
+	ItemTooltipWidget->Refresh(InItem);
 }
 
 void UItmWorldItemWidget::NativeConstruct()

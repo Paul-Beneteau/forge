@@ -19,6 +19,7 @@ public:
 	void Initialize(const FItmItemInstance& InItem, TSubclassOf<UUserWidget> InWidgetClass);
 
 protected:
+	UPROPERTY(BlueprintReadOnly, Category="Item")
 	FItmItemInstance Item;
 	
 	UPROPERTY()

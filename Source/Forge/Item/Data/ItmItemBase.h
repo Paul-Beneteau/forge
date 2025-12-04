@@ -73,8 +73,11 @@ struct FItmItemAttributeTemplate
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float MaxMagnitude = 0.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float Weight = 1.f;
+	
 	// Generate an attribute from the template with a random magnitude between MinMagnitude and MaxMagnitude
-	FItmItemAttribute GenerateRandomAttribute()	{ return FItmItemAttribute(Attribute, ModifierOp, FMath::RandRange(MinMagnitude, MaxMagnitude)); }
+	FItmItemAttribute GenerateRolledAttribute()	{ return FItmItemAttribute(Attribute, ModifierOp, FMath::RandRange(MinMagnitude, MaxMagnitude)); }
 };
 
 // Contains the data to generate an item (name, type, attributes, etc.) 
@@ -94,6 +97,10 @@ struct FItmItemBase : public FTableRowBase
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TArray<FItmItemAttributeTemplate> AttributeTemplates;
+
+	// Chance of base to be picked 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float Weight = 0.f;
 	
 	bool IsValid() const { return Name != NAME_None && ItemType != EItmItemType::None; }
 };
