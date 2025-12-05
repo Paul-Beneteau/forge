@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include "GameplayAbilitySpecHandle.h"
 #include "AaiNonPlayerController.generated.h"
 
 class UAaiAiConfig;
@@ -23,6 +24,8 @@ public:
 	
 	virtual void OnPossess(APawn* InPawn) override;
 
+	FGameplayAbilitySpecHandle GetAbilityHandle() { return AbilityHandle; };
+	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UBlackboardComponent* BlackboardComp;
@@ -31,6 +34,9 @@ protected:
 	TObjectPtr<UAIPerceptionComponent> PerceptionComp;
 	UPROPERTY()
 	TObjectPtr<UAISenseConfig_Sight> Sight;
+
+	// GAS Ability handle for AiConfig->AttackClass ability given
+	FGameplayAbilitySpecHandle AbilityHandle;
 	
 	UFUNCTION()
 	void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);

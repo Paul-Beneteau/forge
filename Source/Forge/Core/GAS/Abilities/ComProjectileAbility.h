@@ -31,8 +31,6 @@ protected:
 	
 	// Spread between 2 projectiles when there is less than 12 projectiles
 	float ConeProjectileSpread = 15.0;
-
-
 	
 	UFUNCTION()
 	void OnCharacterRotated();

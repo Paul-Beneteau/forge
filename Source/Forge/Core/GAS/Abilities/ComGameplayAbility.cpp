@@ -1,7 +1,7 @@
 #include "ComGameplayAbility.h"
 
-#include "ComAbilityDamageCalculation.h"
-#include "ComCombatAttributeSet.h"
+#include "Forge/Core/GAS/AttributeSet/ComCombatAttributeSet.h"
+#include "Forge/Core/GAS/EffectMagnitude/ComAbilityDamageCalculation.h"
 
 UComGameplayAbility::UComGameplayAbility()
 {

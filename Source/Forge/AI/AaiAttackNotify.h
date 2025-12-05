@@ -2,11 +2,11 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimNotifies/AnimNotify.h"
-#include "AaiMeleeAttackNotify.generated.h"
+#include "AaiAttackNotify.generated.h"
 
-// Handle AI character melee attack logic
+// Try activating character AComNonPlayerCharacter GAS ability
 UCLASS()
-class FORGE_API UAaiMeleeAttackNotify : public UAnimNotify
+class FORGE_API UAaiAttackNotify : public UAnimNotify
 {
 	GENERATED_BODY()
 	

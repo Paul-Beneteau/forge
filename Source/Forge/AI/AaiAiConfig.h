@@ -1,9 +1,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Abilities/GameplayAbility.h"
 #include "Engine/DataAsset.h"
 #include "AaiAiConfig.generated.h"
 
+class UGameplayAbility;
 class UGameplayEffect;
 class UBehaviorTree;
 
@@ -14,14 +16,16 @@ class FORGE_API UAaiAiConfig : public UDataAsset
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AI")
-	TObjectPtr<UBehaviorTree> BehaviorTree;
+	UPROPERTY(EditDefaultsOnly, Category="Initial Stats")
+	TSubclassOf<UGameplayEffect> InitialGameplayEffect;
 	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Behavior")
+	TObjectPtr<UBehaviorTree> BehaviorTree;	
 	// Target detection radius
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Perception")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Behavior")
 	float SightRadius = 800.f;
 	// Loosing target detection radius.
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Perception")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Behavior")
 	float LoseSightRadius = 900.f;
 
 	// AI Character Attack
@@ -29,10 +33,12 @@ public:
 	float AttackRange = 100.f;
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	float AttackRadius = 50.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+	TObjectPtr<UAnimMontage> AttackMontage;
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	TSubclassOf<UGameplayEffect> AttackEffect;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
-	TObjectPtr<UAnimMontage> AttackMontage;
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	TSubclassOf<UGameplayAbility> AttackClass;
 	
 	// Blackboard key name used to access blackboard data. It has to be key same name from the blackboard used.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Blackboard")
@@ -52,5 +58,5 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="Blackboard")
 	FName IsMeleeCharacterKeyName = "IsMeleeCharacter";
 
-	FORCEINLINE bool IsValid() { return BehaviorTree != nullptr; };
+	FORCEINLINE bool IsValid() { return InitialGameplayEffect && BehaviorTree && AttackMontage && AttackEffect && AttackClass; };
 };

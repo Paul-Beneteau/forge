@@ -2,9 +2,11 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
+#include "GameplayAbilitySpecHandle.h"
 #include "GameFramework/Character.h"
 #include "ComNonPlayerCharacter.generated.h"
 
+class UGameplayAbility;
 class UGameplayEffect;
 class UComAbilitySystemComponent;
 class UComCombatAttributeSet;
@@ -15,7 +17,7 @@ class FORGE_API AComNonPlayerCharacter : public ACharacter, public IAbilitySyste
 {
 	GENERATED_BODY()
 
-public:
+public:	
 	AComNonPlayerCharacter();
 
 	virtual void BeginPlay() override;
@@ -28,9 +30,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="GAS")
 	TObjectPtr<UComCombatAttributeSet> CombatAttributeSet;
 
-	// TODO: Evaluate if a data asset config is needed for these three members
-	UPROPERTY(EditDefaultsOnly, Category="GAS")
-	TSubclassOf<UGameplayEffect> InitialGameplayEffect;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Death")
 	TObjectPtr<UAnimMontage> DeathMontage = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Death")

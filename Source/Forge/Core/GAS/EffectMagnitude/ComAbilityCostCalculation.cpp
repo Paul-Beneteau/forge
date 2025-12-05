@@ -1,6 +1,6 @@
 #include "ComAbilityCostCalculation.h"
 
-#include "ComProjectileAbility.h"
+#include "Forge/Core/GAS/Abilities/ComGameplayAbility.h"
 
 float UComAbilityCostCalculation::CalculateBaseMagnitude_Implementation(const FGameplayEffectSpec& Spec) const
 {

@@ -1,8 +1,8 @@
 #include "ComProjectileAbility.h"
 
 #include "AbilitySystemComponent.h"
-#include "ComBaseProjectile.h"
-#include "ComDamageModifierAttributeSet.h"
+#include "Forge/Core/GAS/Projectiles/ComBaseProjectile.h"
+#include "Forge/Core/GAS/AttributeSet/ComDamageModifierAttributeSet.h"
 #include "Forge/Core/Character/ComPlayerCharacter.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -15,7 +15,7 @@ void UComProjectileAbility::ActivateAbility(const FGameplayAbilitySpecHandle Han
 		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 		return;
 	}
-
+	
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	const ACharacter* Character = Cast<ACharacter>(GetAvatarActorFromActorInfo());
@@ -43,7 +43,7 @@ void UComProjectileAbility::ActivateAbility(const FGameplayAbilitySpecHandle Han
 	{				
 		SpawnProjectiles(1);
 	
-		EndAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), true, false);		
+		EndAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), true, false);
 	}
 }
 

@@ -20,9 +20,9 @@ protected:
 	TObjectPtr<UParticleSystem> HitActorEffect;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Chain")
-	int32 MaxChains = 3;
+	int32 MaxChains = 4;
 	UPROPERTY(EditDefaultsOnly, Category = "Chain")
-	float ChainRadius = 400.0f;
+	float ChainRadius = 600.0f;
 	int32 RemainingChains = 0;
 
 	UPROPERTY()

@@ -1,9 +1,9 @@
 #include "ComAbilityDamageCalculation.h"
 
 #include "AbilitySystemInterface.h"
-#include "ComCombatAttributeSet.h"
-#include "ComDamageModifierAttributeSet.h"
-#include "ComGameplayAbility.h"
+#include "Forge/Core/GAS/AttributeSet/ComCombatAttributeSet.h"
+#include "Forge/Core/GAS/AttributeSet/ComDamageModifierAttributeSet.h"
+#include "Forge/Core/GAS/Abilities/ComGameplayAbility.h"
 #include "Forge/Core/ComDataTableRow.h"
 
 float UComAbilityDamageCalculation::CalculateBaseMagnitude_Implementation(const FGameplayEffectSpec& Spec) const

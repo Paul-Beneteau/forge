@@ -5,12 +5,8 @@
 #include "BrainComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Forge/Core/GAS/ComAbilitySystemComponent.h"
-#include "Forge/Core/GAS/ComCombatAttributeSet.h"
-#include "Forge/Item/Components/ItmEquipmentComponent.h"
-#include "Forge/Item/Components/ItmInventoryComponent.h"
+#include "Forge/Core/GAS/AttributeSet/ComCombatAttributeSet.h"
 #include "Forge/Item/Generation/ItmItemGeneratorSubsystem.h"
-#include "Forge/Item/Managers/ItmInventoryManager.h"
-#include "GameFramework/CharacterMovementComponent.h"
 
 AComNonPlayerCharacter::AComNonPlayerCharacter()
 {
@@ -28,9 +24,6 @@ void AComNonPlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	AbilitySystemComp->InitAbilityActorInfo(this, this);
-
-	check(InitialGameplayEffect);
-	AbilitySystemComp->ApplyGameplayEffectToSelf(InitialGameplayEffect->GetDefaultObject<UGameplayEffect>(), 1.0f, AbilitySystemComp->MakeEffectContext());
 }
 
 UAbilitySystemComponent* AComNonPlayerCharacter::GetAbilitySystemComponent() const

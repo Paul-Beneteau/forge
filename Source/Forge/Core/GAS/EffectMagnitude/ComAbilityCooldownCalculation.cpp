@@ -1,7 +1,9 @@
 #include "ComAbilityCooldownCalculation.h"
 
+#include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
-#include "ComCombatAttributeSet.h"
+#include "Forge/Core/GAS/AttributeSet/ComCombatAttributeSet.h"
+#include "Forge/Core/GAS/Abilities/ComGameplayAbility.h"
 
 float UComAbilityCooldownCalculation::CalculateBaseMagnitude_Implementation(const FGameplayEffectSpec& Spec) const
 {

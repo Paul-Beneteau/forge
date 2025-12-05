@@ -37,13 +37,13 @@ protected:
 	TSubclassOf<UGameplayEffect> GameplayEffectClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability")
-	int32 BaseDamage;
+	int32 BaseDamage = 0;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability")
-	int32 Cost;
+	int32 Cost = 0;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ability")
-	TObjectPtr<UTexture2D> Icon;
+	TObjectPtr<UTexture2D> Icon = nullptr;
 
 	UPROPERTY(BlueprintAssignable, Category="Ability")
 	FOnAbilityActivated OnAbilityActivated;

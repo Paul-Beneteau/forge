@@ -1,6 +1,9 @@
 #include "AaiNonPlayerController.h"
 
 #include "AaiAiConfig.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
+#include "GameplayAbilitySpec.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/Character.h"
@@ -55,9 +58,8 @@ void AAaiNonPlayerController::BeginPlay()
 		BlackboardComp->SetValueAsFloat(AiConfig->RangeQueryCircleRadiusKeyName, AiConfig->AttackRange - 50.f);
 		
 		// Set character as melee character if his range his below 200. It will make behavior tree move to target melee range
-		BlackboardComp->SetValueAsBool(AiConfig->IsMeleeCharacterKeyName, AiConfig->AttackRange <= 200.f);
-		
-	}
+		BlackboardComp->SetValueAsBool(AiConfig->IsMeleeCharacterKeyName, AiConfig->AttackRange <= 200.f);		
+	}	
 }
 
 void AAaiNonPlayerController::OnPossess(APawn* InPawn)
@@ -89,6 +91,16 @@ void AAaiNonPlayerController::OnPossess(APawn* InPawn)
 
 	if (UseBlackboard(AiConfig->BehaviorTree->BlackboardAsset, BlackboardComp))
 		BlackboardComp->SetValueAsVector(AiConfig->SpawnLocationKeyName, GetPawn()->GetActorLocation());
+
+	// Initialize GAS
+	if (UAbilitySystemComponent* AbilitySystemComp = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetPawn()))
+	{
+		AbilitySystemComp->ApplyGameplayEffectToSelf(AiConfig->InitialGameplayEffect->GetDefaultObject<UGameplayEffect>(), 1.0f,
+			AbilitySystemComp->MakeEffectContext());
+		
+		FGameplayAbilitySpec AbilitySpec(AiConfig->AttackClass, 1, INDEX_NONE, this);
+		AbilityHandle = AbilitySystemComp->GiveAbility(AbilitySpec);
+	}
 }
 
 void AAaiNonPlayerController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
