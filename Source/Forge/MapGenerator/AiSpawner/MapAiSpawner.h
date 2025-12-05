@@ -8,12 +8,24 @@
 class AComNonPlayerCharacter;
 
 USTRUCT(BlueprintType)
-struct FMapAiSpawnerConfig
+struct FMapAiPackClass
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Spawner")
 	TSubclassOf<AComNonPlayerCharacter> PackClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Spawner")
+	float Weight = 1.0f;
+};
+
+USTRUCT(BlueprintType)
+struct FMapAiSpawnerConfig
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Spawner")
+	 TArray<FMapAiPackClass> PackClasses;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Spawner")
 	int32 MinPackSize = 4;

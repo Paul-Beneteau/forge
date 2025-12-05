@@ -29,6 +29,6 @@ float UComAbilityCooldownCalculation::CalculateBaseMagnitude_Implementation(cons
 			Cooldown = 1.0f / AttackSpeed;
 		}
 	}
-
+	
 	return Cooldown;
 }

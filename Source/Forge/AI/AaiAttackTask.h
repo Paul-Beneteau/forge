@@ -19,7 +19,7 @@ protected:
 	
 	FTimerHandle TimerHandle;
 
-	FRotator TargetRotation;  // Add this
+	FRotator TargetRotation;
     
 	void OnCharacterRotating();
 };

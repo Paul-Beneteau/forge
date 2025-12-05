@@ -1,6 +1,7 @@
 #include "MapAiSpawner.h"
 
 #include "Forge/Core/Character/ComNonPlayerCharacter.h"
+#include "Forge/MapGenerator/MapGraphUtils.h"
 
 
 void UMapAiSpawner::SpawnAiPack(const FMapAiSpawnerConfig& AiSpawnerConfig, const FVector& TileLocation, int32 TileSize)
@@ -8,10 +9,15 @@ void UMapAiSpawner::SpawnAiPack(const FMapAiSpawnerConfig& AiSpawnerConfig, cons
 	if (FMath::FRand() > AiSpawnerConfig.ChanceToSpawnPerTile)
 		return;
 
+	if (AiSpawnerConfig.PackClasses.IsEmpty())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UMapAiSpawner: PackClasses is empty"));
+		return;
+	}
+		
 	const float SpawnRadius = TileSize * 0.30f;
 
 	check(GetWorld());
-	check(AiSpawnerConfig.PackClass);
 
 	int32 PackSize = FMath::RandRange(AiSpawnerConfig.MinPackSize, AiSpawnerConfig.MaxPackSize);
 	
@@ -20,10 +26,13 @@ void UMapAiSpawner::SpawnAiPack(const FMapAiSpawnerConfig& AiSpawnerConfig, cons
 		// Retry if the random location selected is not valid
 		for (int32 Retries = 0; Retries < 5; Retries++)
 		{
+			auto GetWeight = [](const FMapAiPackClass& PackClass) -> float { return PackClass.Weight; };
+			FMapAiPackClass SelectedPackClass = MapUtils::PickWeightedRandom<FMapAiPackClass>(AiSpawnerConfig.PackClasses, GetWeight);
+			
 			FVector RandomOffset(FMath::RandRange(-SpawnRadius, SpawnRadius),FMath::RandRange(-SpawnRadius, SpawnRadius),0.f);
 			FVector SpawnLocation = TileLocation + RandomOffset;
 		
-			AComNonPlayerCharacter* AiCharacter = GetWorld()->SpawnActor<AComNonPlayerCharacter>(AiSpawnerConfig.PackClass,	SpawnLocation,
+			AComNonPlayerCharacter* AiCharacter = GetWorld()->SpawnActor<AComNonPlayerCharacter>(SelectedPackClass.PackClass,	SpawnLocation,
 				FRotator::ZeroRotator);
 			if (AiCharacter)
 			{

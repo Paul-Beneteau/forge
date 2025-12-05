@@ -25,8 +25,14 @@ protected:
 	
 	FTimerHandle TimerHandle;
 
+	// Number of projectiles spawned
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
+	int32 BaseProjectileCount = 1;
+	
 	// Spread between 2 projectiles when there is less than 12 projectiles
 	float ConeProjectileSpread = 15.0;
+
+
 	
 	UFUNCTION()
 	void OnCharacterRotated();

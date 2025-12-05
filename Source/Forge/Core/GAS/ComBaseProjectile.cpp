@@ -35,8 +35,6 @@ void AComBaseProjectile::Initialize(TSubclassOf<UGameplayEffect> InHitActorGamep
 void AComBaseProjectile::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-
-	//MeshComp->OnComponentBeginOverlap.AddDynamic(this, &AComBaseProjectile::OnActorOverlap);
 	CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &AComBaseProjectile::OnActorOverlap);
 }
 
@@ -46,8 +44,6 @@ void AComBaseProjectile::BeginPlay()
 
 	if (HitWorldParticleEffect)
 		UGameplayStatics::SpawnEmitterAtLocation(this, HitWorldParticleEffect, GetActorLocation(), GetActorRotation());
-	else
-		UE_LOG(LogTemp, Warning, TEXT("AComBaseProjectile: HitWorldEffect has not been set"));
 
 	SetLifeSpan(LifeSpawn);
 }
@@ -56,36 +52,59 @@ void AComBaseProjectile::BeginPlay()
 void AComBaseProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {	
-	UE_LOG(LogTemp, Warning, TEXT("AComBaseProjectile::OnActorOverlap"));
-	
-	if (OtherActor == GetInstigator() || OtherActor == this)
+	if (!IsValidTarget(OtherActor))
 		return;
 
+	HandleActorHit(OtherActor);
+}
+
+bool AComBaseProjectile::IsValidTarget(AActor* Actor) const
+{
+	if (!Actor || Actor == GetInstigator() || Actor == this)
+		return false;
+
+	APawn* OtherPawn = Cast<APawn>(Actor);
+	if (!OtherPawn)
+		return false;
+
+	// Ignore if this is an AI character attacking another AI character
+	if (!OtherPawn->IsPlayerControlled() && GetInstigator() && !GetInstigator()->IsPlayerControlled())
+		return false;
+
+	return true;
+}
+
+void AComBaseProjectile::HandleActorHit(AActor* HitActor)
+{
 	if (HitActorParticleEffect)
 		UGameplayStatics::SpawnEmitterAtLocation(this, HitActorParticleEffect, GetActorLocation(), GetActorRotation());
-	else
-		UE_LOG(LogTemp, Warning, TEXT("AComBaseProjectile: projectile HitActorEffect is null"));
 
-	AActor* InstigatorActor = Cast<ACharacter>(GetInstigator());
-	AActor* TargetActor = Cast<ACharacter>(OtherActor);
-	
+	ApplyGameplayEffect(HitActor);
+
+	Destroy();
+}
+
+void AComBaseProjectile::ApplyGameplayEffect(AActor* TargetActor)
+{
+	AActor* InstigatorActor = GetInstigator();
 	if (!InstigatorActor || !TargetActor)
 		return;
 
 	UAbilitySystemComponent* TargetAbilitySystemComp = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
 	UAbilitySystemComponent* InstigatorAbilitySystemComp = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(InstigatorActor);
+    
 	if (!TargetAbilitySystemComp || !InstigatorAbilitySystemComp)
 		return;
-	
+
+	if (!HitActorGameplayEffect)
+	{
+		UE_LOG(LogTemp, Error, TEXT("AComBaseProjectile: HitActorGameplayEffect has not been set"));
+		return;
+	}
+
 	FGameplayEffectContextHandle EffectHandle = InstigatorAbilitySystemComp->MakeEffectContext();
 	EffectHandle.SetAbility(InstigatorAbility);
 
-	if (HitActorGameplayEffect)
-		InstigatorAbilitySystemComp->ApplyGameplayEffectToTarget(HitActorGameplayEffect->GetDefaultObject<UGameplayEffect>(),
-		TargetAbilitySystemComp, 1.0f, EffectHandle);
-	else
-		UE_LOG(LogTemp, Error, TEXT("AComBaseProjectile: HitActorGameplayEffect has not been set"));
-
-	
-	Destroy();
+	InstigatorAbilitySystemComp->ApplyGameplayEffectToTarget(HitActorGameplayEffect->GetDefaultObject<UGameplayEffect>(), TargetAbilitySystemComp, 
+		1.0f, EffectHandle);
 }

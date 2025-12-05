@@ -61,7 +61,7 @@ void UComProjectileAbility::OnCharacterRotated()
 	Character->GetCharacterMovement()->bOrientRotationToMovement = true;	
 
 	// Add the AdditionalProjectile modifier that can increase number of projectile
-	SpawnProjectiles(1 + Character->DamageAttributeSet->GetAdditionalProjectile());
+	SpawnProjectiles(BaseProjectileCount + Character->DamageAttributeSet->GetAdditionalProjectile());
 	
 	EndAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), true, false);
 }

@@ -24,7 +24,6 @@ class FORGE_API UComDamageModifierAttributeSet : public UAttributeSet
 	GENERATED_BODY()
 	
 public:
-	ATTRIBUTE_ACCESSORS(UComDamageModifierAttributeSet, AddedPhysicalDamage)
 	ATTRIBUTE_ACCESSORS(UComDamageModifierAttributeSet, AddedFireDamage)
 	ATTRIBUTE_ACCESSORS(UComDamageModifierAttributeSet, AddedLightningDamage)
 	ATTRIBUTE_ACCESSORS(UComDamageModifierAttributeSet, AddedColdDamage)	
@@ -32,7 +31,6 @@ public:
 	ATTRIBUTE_ACCESSORS(UComDamageModifierAttributeSet, IncreasedFireDamage)
 	ATTRIBUTE_ACCESSORS(UComDamageModifierAttributeSet, IncreasedLightningDamage)
 	ATTRIBUTE_ACCESSORS(UComDamageModifierAttributeSet, IncreasedColdDamage)
-	ATTRIBUTE_ACCESSORS(UComDamageModifierAttributeSet, IncreasedAttackDamage)
 	ATTRIBUTE_ACCESSORS(UComDamageModifierAttributeSet, IncreasedProjectileDamage)
 	ATTRIBUTE_ACCESSORS(UComDamageModifierAttributeSet, MoreDamage)
 	ATTRIBUTE_ACCESSORS(UComDamageModifierAttributeSet, AdditionalProjectile)
