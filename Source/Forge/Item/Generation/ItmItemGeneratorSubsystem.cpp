@@ -1,5 +1,6 @@
 #include "Forge/Item/Generation/ItmItemGeneratorSubsystem.h"
 #include "ItmWorldItem.h"
+#include "Forge/Item/Components/ItmCrafterComponent.h"
 #include "Forge/MapGenerator/MapGraphUtils.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -33,50 +34,9 @@ FItmItemInstance UItmItemGeneratorSubsystem::GenerateRandomItem() const
 	FItmItemInstance RandomItem;
 	RandomItem.ItemBase = *ItemBase;
 
-	constexpr int32 MaxAttributesCount = 6;
-	// Generate the number of attributes for the item
-	const int32 RandomAttributesCount = GenerateAttributeCount();
-
-	TArray<FItmItemAttributeTemplate> RemainingTemplates = RandomItem.ItemBase.AttributeTemplates;
-    
-	for (int32 AttributeIndex = 0; AttributeIndex < RandomAttributesCount && !RemainingTemplates.IsEmpty(); ++AttributeIndex)
-	{
-		FItmItemAttributeTemplate* SelectedTemplate = PickWeightedRandomTemplate(RemainingTemplates);
-		if (!SelectedTemplate)
-			break;
-
-		// Generate attribute with a rolled value
-		RandomItem.Attributes.Add(SelectedTemplate->GenerateRolledAttribute());
-
-		// Remove the used template to avoid duplicates
-		RemainingTemplates.RemoveAll([SelectedTemplate](const FItmItemAttributeTemplate& Template)
-		{
-			return Template.Attribute == SelectedTemplate->Attribute;
-		});
-	}
+	UItmCrafterComponent::GenerateItemAttributes(RandomItem);
     
 	return RandomItem;
-}
-
-int32 UItmItemGeneratorSubsystem::GenerateAttributeCount() const
-{
-	TArray<float> Weights = { 10, 8, 5, 3, 2, 1 };
-
-	float TotalWeight = 0.0f;
-	for (float Weight : Weights)
-		TotalWeight += Weight;
-
-	const float RandomWeight = FMath::FRandRange(0.0f, TotalWeight);
-	float CurrentWeight = 0.0f;
-
-	for (int32 i = 0; i < Weights.Num(); ++i)
-	{
-		CurrentWeight += Weights[i];
-		if (RandomWeight <= CurrentWeight)
-			return i + 1;
-	}
-
-	return 1;
 }
 
 FItmItemBase* UItmItemGeneratorSubsystem::GenerateRandomItemBase() const
@@ -122,34 +82,6 @@ FItmItemBase* UItmItemGeneratorSubsystem::GenerateRandomItemBase() const
 	}
 
 	return ItemBases.Last();
-}
-
-FItmItemAttributeTemplate* UItmItemGeneratorSubsystem::PickWeightedRandomTemplate(TArray<FItmItemAttributeTemplate>& Templates) const
-{
-	if (Templates.IsEmpty())
-		return nullptr;
-
-	float TotalWeight = 0.0f;
-	for (const FItmItemAttributeTemplate& Template : Templates)
-		TotalWeight += Template.Weight;
-
-	if (TotalWeight <= 0.0f)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UItmItemGeneratorSubsystem: Total weight is 0, picking random template"));
-		return &Templates[FMath::RandRange(0, Templates.Num() - 1)];
-	}
-
-	const float RandomWeight = FMath::FRandRange(0.0f, TotalWeight);
-	float CurrentWeight = 0.0f;
-
-	for (FItmItemAttributeTemplate& Template : Templates)
-	{
-		CurrentWeight += Template.Weight;
-		if (RandomWeight <= CurrentWeight)
-			return &Template;
-	}
-
-	return &Templates.Last();
 }
 
 AItmWorldItem* UItmItemGeneratorSubsystem::SpawnWorldItem(const FItmItemInstance& Item, const FVector& Location) const

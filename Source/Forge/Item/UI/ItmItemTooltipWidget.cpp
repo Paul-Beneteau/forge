@@ -8,14 +8,17 @@ void UItmItemTooltipWidget::Refresh(const FItmItemInstance& NewItem)
 	if (NewItem.IsValid())
 	{
 		NameLabelWidget->SetText(FText::FromName(NewItem.ItemBase.Name));
-		
-		if (NewItem.Attributes.Num() > 2)
+
+		if (NewItem.Attributes.Num() == 0)
+			NameLabelWidget->SetColorAndOpacity(CraftItemColor);
+		else if (NewItem.Attributes.Num() > 2)
 			NameLabelWidget->SetColorAndOpacity(RareItemColor);
 		else
 			NameLabelWidget->SetColorAndOpacity(MagicItemColor);
-		
+
+		SetInformationLabel(NewItem);
 		SetAttributesLabel(NewItem);
-		SetVisibility(ESlateVisibility::HitTestInvisible);
+		SetVisibility(ESlateVisibility::HitTestInvisible);		
 	}
 	else
 	{
@@ -70,6 +73,19 @@ void UItmItemTooltipWidget::SetAttributesLabel(const FItmItemInstance& Item)
 	}
 
 	AttributesLabelWidget->SetText(FText::FromString(AttributesText));
+	AttributesLabelWidget->SetVisibility(ESlateVisibility::HitTestInvisible);
+	
+	if (AttributesText.IsEmpty())
+		AttributesLabelWidget->SetVisibility(ESlateVisibility::Collapsed);
+}
+
+void UItmItemTooltipWidget::SetInformationLabel(const FItmItemInstance& Item)
+{
+	InformationLabelWidget->SetText(FText::FromString(Item.ItemBase.Description));
+	InformationLabelWidget->SetVisibility(ESlateVisibility::HitTestInvisible);
+	
+	if (Item.ItemBase.Description.IsEmpty())
+		InformationLabelWidget->SetVisibility(ESlateVisibility::Collapsed);
 }
 
 void UItmItemTooltipWidget::NativeConstruct()

@@ -22,7 +22,15 @@ struct FItmItemInstance
 	// Empty entry used for initialization
 	static const FItmItemInstance Empty;
 	
-	bool IsValid() const { return Id.IsValid() && ItemBase.IsValid(); }
+	FORCEINLINE bool IsValid() const { return Id.IsValid() && ItemBase.IsValid(); }
+
+	// Craft item and equipment item are grouped together as it is simple for now. If Crafted item type increases we may need separating them.
+	FORCEINLINE bool IsCraftItem() const
+	{
+		return ItemBase.ItemType == EItmItemType::AugmentOrb
+		||  ItemBase.ItemType == EItmItemType::ReforgeOrb
+		|| ItemBase.ItemType == EItmItemType::RefineOrb;
+	}
 };
 
 // Represent an inventory item. 

@@ -19,7 +19,9 @@ enum class EItmItemType : uint8
 	Amulet			UMETA(DisplayName = "Amulet"),
 	Belt			UMETA(DisplayName = "Belt"),
 	Weapon			UMETA(DisplayName = "Weapon"),
-	Currency		UMETA(DisplayName = "Currency"),
+	AugmentOrb		UMETA(DisplayName = "Augment Orb"),
+	ReforgeOrb		UMETA(DisplayName = "Reforge Orb"),
+	RefineOrb		UMETA(DisplayName = "Refine Orb"),
 };
 
 // Enum used to differentiate each equipment widget.  Can be associated with a widget in a TMap.
@@ -77,7 +79,10 @@ struct FItmItemAttributeTemplate
 	float Weight = 1.f;
 	
 	// Generate an attribute from the template with a random magnitude between MinMagnitude and MaxMagnitude
-	FItmItemAttribute GenerateRolledAttribute()	{ return FItmItemAttribute(Attribute, ModifierOp, FMath::RandRange(MinMagnitude, MaxMagnitude)); }
+	FORCEINLINE FItmItemAttribute GenerateRolledAttribute()	const
+	{
+		return FItmItemAttribute(Attribute, ModifierOp, FMath::RandRange(MinMagnitude, MaxMagnitude));
+	}
 };
 
 // Contains the data to generate an item (name, type, attributes, etc.) 
@@ -87,7 +92,7 @@ struct FItmItemBase : public FTableRowBase
 	GENERATED_BODY()
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FName Name = "NAME_None";
+	FName Name = NAME_None;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	EItmItemType ItemType = EItmItemType::None;
@@ -98,6 +103,9 @@ struct FItmItemBase : public FTableRowBase
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TArray<FItmItemAttributeTemplate> AttributeTemplates;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FString Description;
+	
 	// Chance of base to be picked 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float Weight = 0.f;

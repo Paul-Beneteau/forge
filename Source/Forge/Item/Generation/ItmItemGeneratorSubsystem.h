@@ -33,11 +33,6 @@ protected:
 	TObjectPtr<UItmItemGeneratorConfig> ItemGeneratorConfig = nullptr;
 	
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
-
-	FItmItemAttributeTemplate* PickWeightedRandomTemplate(TArray<FItmItemAttributeTemplate>& Templates) const;
-
-	int32 GenerateAttributeCount() const;
-
 	
 	// Generate a random item base from the data table ItemBasePool
 	FItmItemBase*  GenerateRandomItemBase() const;

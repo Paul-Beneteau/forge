@@ -17,14 +17,16 @@ public:
 	void Refresh(const FItmItemInstance& NewItem);
 	
 protected:
-	// Item name
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<UTextBlock> NameLabelWidget;
-
 	// List of item attributes
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<UTextBlock> AttributesLabelWidget;
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	TObjectPtr<UTextBlock> InformationLabelWidget;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Name Color")
+	FSlateColor CraftItemColor;
 	UPROPERTY(EditDefaultsOnly, Category = "Name Color")
 	FSlateColor MagicItemColor;
 	UPROPERTY(EditDefaultsOnly, Category = "Name Color")
@@ -33,4 +35,6 @@ protected:
 	virtual void NativeConstruct() override;
 
 	void SetAttributesLabel(const FItmItemInstance& Item);
+	
+	void SetInformationLabel(const FItmItemInstance& Item);
 };

@@ -4,6 +4,7 @@
 #include "Forge/Item/UI/ItmInventoryRootWidget.h"
 #include "ItmInventoryManager.generated.h"
 
+class UItmCrafterComponent;
 class UItmInventoryRootWidget;
 class UItmInventoryComponent;
 class UItmEquipmentComponent;
@@ -19,7 +20,7 @@ class FORGE_API UItmInventoryManager : public UObject
 
 public:
 	void Initialize(APlayerController* InPlayerController, UItmInventoryComponent* InInventoryComp, UItmEquipmentComponent* InEquipmentComp,
-		TSubclassOf<UItmInventoryRootWidget> InInventoryWidgetClass);
+		UItmCrafterComponent* InCrafterComp, TSubclassOf<UItmInventoryRootWidget> InInventoryWidgetClass);
 
 	UItmInventoryRootWidget* GetInventoryRoot() { return InventoryWidget; };
 
@@ -36,10 +37,17 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UItmEquipmentComponent> EquipmentComp = nullptr;
 	UPROPERTY()
+	TObjectPtr<UItmCrafterComponent> CrafterComp = nullptr;
+	UPROPERTY()
 	TObjectPtr<UItmInventoryRootWidget> InventoryWidget = nullptr;
 	
 	UFUNCTION()
 	void HandleGridSlotClicked(int32 SlotIndex);
+
+	void CraftGridSlotItem(int32 SlotIndex);
+	
+	void SwapGridSlotWithHeldItem(int32 SlotIndex);
+	
 	UFUNCTION()
 	void HandleGridSlotHovered(int32 SlotIndex);
 	UFUNCTION()

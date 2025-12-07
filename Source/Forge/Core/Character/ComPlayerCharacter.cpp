@@ -182,7 +182,7 @@ void AComPlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	InventoryManager = NewObject<UItmInventoryManager>(this);
-	InventoryManager->Initialize(GetController<APlayerController>(), InventoryComp, EquipmentComp, PlayerConfig->InventoryWidgetClass);
+	InventoryManager->Initialize(GetController<APlayerController>(), InventoryComp, EquipmentComp, CrafterComp, PlayerConfig->InventoryWidgetClass);
 }
 
 void AComPlayerCharacter::OnInputStarted()

@@ -1,20 +1,22 @@
 #include "ItmInventoryManager.h"
 
 #include "Blueprint/UserWidget.h"
+#include "Forge/Item/Components/ItmCrafterComponent.h"
 #include "Forge/Item/Components/ItmEquipmentComponent.h"
 #include "Forge/Item/Components/ItmInventoryComponent.h"
 #include "Forge/Item/Generation/ItmItemGeneratorSubsystem.h"
 #include "Forge/Item/UI/ItmInventoryRootWidget.h"
 
 void UItmInventoryManager::Initialize(APlayerController* InPlayerController, UItmInventoryComponent* InInventoryComp,
-	UItmEquipmentComponent* InEquipmentComp, TSubclassOf<UItmInventoryRootWidget> InInventoryWidgetClass)
+	UItmEquipmentComponent* InEquipmentComp, UItmCrafterComponent* InCrafterComp, TSubclassOf<UItmInventoryRootWidget> InInventoryWidgetClass)
 {
 	check(InPlayerController && InInventoryComp && InEquipmentComp && InInventoryWidgetClass);
 
 	PlayerController = InPlayerController;
 	InventoryComp = InInventoryComp;
 	EquipmentComp = InEquipmentComp;
-
+	CrafterComp = InCrafterComp;
+	
 	InventoryWidget = CreateWidget<UItmInventoryRootWidget>(PlayerController, InInventoryWidgetClass);
 	InventoryWidget->AddToViewport(1);
 
@@ -32,6 +34,40 @@ void UItmInventoryManager::Initialize(APlayerController* InPlayerController, UIt
 }
 
 void UItmInventoryManager::HandleGridSlotClicked(int32 SlotIndex)
+{
+	FItmInventoryEntry GridSlotItem = InventoryComp->GetGridSlotItem(SlotIndex);
+	FItmInventoryEntry HeldItem = InventoryComp->GetHeldItem();
+
+	// If held item is a valid crafting item and grid slot click has not a crafting item
+	if (HeldItem.IsValid() &&  GridSlotItem.IsValid() && HeldItem.Item.IsCraftItem() && !GridSlotItem.Item.IsCraftItem())
+		CraftGridSlotItem(SlotIndex);
+	else
+		SwapGridSlotWithHeldItem(SlotIndex);
+}
+
+void UItmInventoryManager::CraftGridSlotItem(int32 SlotIndex)
+{
+	FItmInventoryEntry GridSlotItem = InventoryComp->GetGridSlotItem(SlotIndex);
+	FItmInventoryEntry HeldItem = InventoryComp->GetHeldItem();
+	
+	bool DidCraftSucceed = CrafterComp->Craft(GridSlotItem.Item, HeldItem.Item);
+	if (!DidCraftSucceed)
+		return;
+
+	// Remove the item that was used for crafting and refresh widgets
+	HeldItem.Quantity--;
+	if (HeldItem.Quantity <= 0)
+		HeldItem = FItmInventoryEntry();
+			
+	InventoryComp->SetHeldItem(HeldItem);
+	InventoryComp->SetGridSlotItem(SlotIndex, GridSlotItem);
+
+	InventoryWidget->RefreshGridSlot(SlotIndex, GridSlotItem);
+	InventoryWidget->RefreshHeldItem(HeldItem);			
+	InventoryWidget->RefreshGridSlotTooltip(SlotIndex, InventoryComp->GetGridSlotItem(SlotIndex));			
+}
+
+void UItmInventoryManager::SwapGridSlotWithHeldItem(int32 SlotIndex)
 {
 	FItmInventoryEntry NewGridSlotItem = InventoryComp->GetHeldItem();
 	FItmInventoryEntry NewHeldItem = InventoryComp->GetGridSlotItem(SlotIndex);

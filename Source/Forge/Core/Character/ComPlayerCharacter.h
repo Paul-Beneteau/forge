@@ -6,6 +6,7 @@
 #include "ComPlayerConfig.h"
 #include "ComPlayerCharacter.generated.h"
 
+class UItmCrafterComponent;
 class UItmInventoryRootWidget;
 class UItmInventoryManager;
 class UItmInventoryComponent;
@@ -67,6 +68,8 @@ protected:
 	TObjectPtr<UItmEquipmentComponent> EquipmentComp;
 	UPROPERTY()
 	TObjectPtr<UItmInventoryComponent> InventoryComp;
+	UPROPERTY()
+	TObjectPtr<UItmCrafterComponent> CrafterComp;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory")
 	TObjectPtr<UItmInventoryManager> InventoryManager;
 	
