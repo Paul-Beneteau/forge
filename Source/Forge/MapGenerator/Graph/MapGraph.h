@@ -39,9 +39,6 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	int32 Columns = 0;
 
-	FMapGraphCoord MainPathStart = FMapGraphCoord(0, 0);
-	FMapGraphCoord MainPathEnd = FMapGraphCoord(0, 0);
-
 	// Metadata used to display information on the generated graph for widgets
 	UPROPERTY(BlueprintReadOnly)
 	EMapPathLayout MainPathLayout = EMapPathLayout::None;
@@ -50,6 +47,9 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly)
 	int32 BranchesCount = 0;
+
+	UPROPERTY(BlueprintReadOnly)
+	TArray<FMapSegment> MainPath;
 	
 	FMapGraph() = default;	
 	FMapGraph(const int32 InRows, const int32 InColumns) : Rows(InRows), Columns(InColumns) { Cells.SetNum(Rows * Columns); };
@@ -58,4 +58,7 @@ public:
 	FORCEINLINE const FMapGraphCell& At(const FMapGraphCoord& Coord) const { return Cells[Coord.Row * Columns + Coord.Column]; }
 	
 	FORCEINLINE void Reset() { Cells.Reset(); }
+
+	FMapGraphCoord GetMainPathStart() const { return MainPath[0].Start; }
+	FMapGraphCoord GetMainPathEnd() const { return MainPath.Last().End(); }
 };

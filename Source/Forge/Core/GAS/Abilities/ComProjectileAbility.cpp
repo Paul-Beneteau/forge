@@ -1,6 +1,9 @@
 #include "ComProjectileAbility.h"
 
 #include "AbilitySystemComponent.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "Forge/AI/AaiAiConfig.h"
+#include "Forge/AI/AaiNonPlayerController.h"
 #include "Forge/Core/GAS/Projectiles/ComBaseProjectile.h"
 #include "Forge/Core/GAS/AttributeSet/ComDamageModifierAttributeSet.h"
 #include "Forge/Core/Character/ComPlayerCharacter.h"
@@ -18,8 +21,9 @@ void UComProjectileAbility::ActivateAbility(const FGameplayAbilitySpecHandle Han
 	
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	const ACharacter* Character = Cast<ACharacter>(GetAvatarActorFromActorInfo());
+	ACharacter* Character = Cast<ACharacter>(GetAvatarActorFromActorInfo());
 
+	// TODO Refactor function to extract player and AI character logic
 	// Spawn a projectile in the direction of the cursor click
 	if (APlayerController* PlayerController = Cast<APlayerController>(Character->GetController()))
 	{
@@ -38,10 +42,33 @@ void UComProjectileAbility::ActivateAbility(const FGameplayAbilitySpecHandle Han
 			// Spawn projectile. Loop to wait until character finish rotating
 			GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UComProjectileAbility::OnCharacterRotated, 0.1f, true);
 		}
-	} // AI character abilities doesn't need to rotate before. TODO: Find a clean way to handle this
-	else if (AController* AiController = Cast<AController>(Character->GetController()))
+	} // AI character abilities doesn't need to rotate before.
+	else if (AAaiNonPlayerController* AiController = Cast<AAaiNonPlayerController>(Character->GetController()))
 	{				
-		SpawnProjectiles(1);
+		FVector ProjectileLocation = Character->GetMesh()->GetSocketLocation(SpawnSocketName);
+		AActor* Target = Cast<AActor>(AiController->GetBlackboardComponent()->GetValueAsObject(AiController->AiConfig->TargetActorKeyName));
+		if (!Target)
+			return;
+
+		FRotator ProjectileRotation = (Target->GetActorLocation() - Character->GetActorLocation()).Rotation();
+		ProjectileRotation.Pitch = 0.0f;
+		ProjectileRotation.Roll = 0.0f;
+		
+		AComBaseProjectile* Projectile = GetWorld()->SpawnActorDeferred<AComBaseProjectile>(ProjectileClass,FTransform(ProjectileRotation,
+			ProjectileLocation),nullptr, AiController->GetPawn(), ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+
+		Character->SetActorRotation(ProjectileRotation);
+		
+		if (Projectile)
+		{
+			Projectile->Initialize(GameplayEffectClass, this);
+			Projectile->FinishSpawning(FTransform(ProjectileRotation, ProjectileLocation));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("UComProjectileAbility: Projectile didn't spawn"));
+			return;
+		}
 	
 		EndAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), true, false);
 	}

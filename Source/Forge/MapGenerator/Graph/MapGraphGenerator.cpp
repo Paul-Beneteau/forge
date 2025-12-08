@@ -74,15 +74,8 @@ TArray<FMapSegment> UMapGraphGenerator::CreateMainPath(const FMapPathConfig& Pat
 	Constraints.Bounds = FMapGraphCoord(Rows - 1, Columns - 1);
 	Constraints.IsCellUsed = [this](const FMapGraphCoord& Coord) { return CachedMapGraph.At(Coord).IsUsed(); };
 	
-	TArray<FMapSegment> MainPath = GenerateAndPlacePath(PathConfig, Constraints);
-
-	if (!MainPath.IsEmpty())
-	{
-		CachedMapGraph.MainPathStart = MainPath[0].Start;
-		CachedMapGraph.MainPathEnd = MainPath.Last().End();
-	}
-
-	return MainPath;
+	CachedMapGraph.MainPath = GenerateAndPlacePath(PathConfig, Constraints);
+	return CachedMapGraph.MainPath;
 }
 
 FMapGraphCoord UMapGraphGenerator::GenerateMainPathStart() const

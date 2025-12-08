@@ -31,6 +31,11 @@ public:
 	void ClearMap();
 
 	UFUNCTION(BlueprintCallable)
+	const FMapGraph& GenerateGraph();
+	UFUNCTION(BlueprintCallable)
+	void GenerateMapFromGraph(const FMapGraph& Graph);
+	
+	UFUNCTION(BlueprintCallable)
 	void TeleportPlayerToStart();
 
 	UFUNCTION(BlueprintCallable)

@@ -37,7 +37,7 @@ void UAaiAttackTask::OnCharacterRotating()
 	FRotator CurrentRotation = CachedCharacter->GetActorRotation();
     
 	// Interpolate to target rotation
-	FRotator NewRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, 0.01f, 10.0f);
+	FRotator NewRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, 0.01f, 14.0f);
 	CachedCharacter->SetActorRotation(NewRotation);
     
 	// If we're within 2 degrees of the rotation target

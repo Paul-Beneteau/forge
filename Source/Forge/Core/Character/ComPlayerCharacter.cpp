@@ -279,7 +279,7 @@ void AComPlayerCharacter::Respawn()
 	GetMesh()->SetSimulatePhysics(false);
 	GetMesh()->bPauseAnims = false;
 
-	// Reset mesh after ragdoll. TODO: parametrize values
+	// Reset mesh after ragdoll.
 	GetMesh()->AttachToComponent(GetCapsuleComponent(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -90.0f),FRotator(0.0f, -90.0f, 0.0f));
 	

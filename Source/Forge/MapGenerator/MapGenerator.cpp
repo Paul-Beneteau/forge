@@ -36,7 +36,7 @@ void AMapGenerator::GenerateMap()
 			AiSpawner->SpawnAiPack(GeneratorConfig->AiSpawnerConfig, TileSpawnData.GetWorldLocation(TileSize), TileSize);
 
 		// Spawn a portal at the end
-		if (TileSpawnData.Coord == CachedMapGraph.MainPathEnd)
+		if (TileSpawnData.Coord == CachedMapGraph.GetMainPathEnd())
 			SpawnedPortal = GetWorld()->SpawnActor<AMapPortal>(GeneratorConfig->PortalClass,
 				TileSpawnData.GetWorldLocation(TileSize) + FVector(0.f, 0.f, 100.f ),	TileSpawnData.Rotation);
 	}
@@ -59,29 +59,62 @@ void AMapGenerator::ClearMap()
 	AiSpawner->RemoveSpawnedPacks();
 }
 
+const FMapGraph& AMapGenerator::GenerateGraph()
+{
+	CachedMapGraph = GraphGenerator->GenerateMapGraph();
+	return CachedMapGraph;
+}
+
+void AMapGenerator::GenerateMapFromGraph(const FMapGraph& Graph)
+{
+	TArray<FMapTileSpawnData> TilesToSpawn = TileSelector->SelectTiles(Graph);
+	
+	for (const FMapTileSpawnData& TileSpawnData : TilesToSpawn)
+	{
+		AMapTile* Tile = GetWorld()->SpawnActor<AMapTile>(
+			TileSpawnData.TileClass,
+			TileSpawnData.GetWorldLocation(TileSize),
+			TileSpawnData.Rotation);
+
+		if (!Tile)
+			continue;
+
+		SpawnedTiles.Add(Tile);
+
+		if (Graph.At(TileSpawnData.Coord).Connectors.IsEmpty())
+			AiSpawner->SpawnAiPack(GeneratorConfig->AiSpawnerConfig, TileSpawnData.GetWorldLocation(TileSize), TileSize);
+
+		// Spawn a portal at the end
+		if (TileSpawnData.Coord == Graph.GetMainPathEnd())
+			SpawnedPortal = GetWorld()->SpawnActor<AMapPortal>(GeneratorConfig->PortalClass,
+				TileSpawnData.GetWorldLocation(TileSize) + FVector(0.f, 0.f, 100.f ),	TileSpawnData.Rotation);
+	}	
+}
+
 namespace 
 {	
 	FColor GetCellColor(const FMapGraphCell& Cell, const FMapGraph& MapGraph, FMapGraphCoord CellCoord)
 	{
 		if (!Cell.IsUsed())
 			return FColor::Black;
+		if (CellCoord == MapGraph.GetMainPathStart())
+			return FColor::Green;			
+		if (CellCoord == MapGraph.GetMainPathEnd())
+			return FColor::Magenta;
 
-		if (CellCoord == MapGraph.MainPathStart)
-			return FColor::Green;
-			
-		if (CellCoord == MapGraph.MainPathEnd)
-			return FColor::Red;
-
-		// The cell is part of a path, show a brown color
-		for (FMapConnector Connector: MapGraph.At(CellCoord).Connectors)
+		// If this is main path
+		for (FMapSegment Segment : MapGraph.MainPath)
 		{
-			if (Connector.Type == EMapConnectorType::Path)
-				return FColor::Blue;				
-		}
+			for (int32 Index = 0; Index < Segment.Length; ++Index)
+			{
+				if (Segment.GetCoordAt(Index) == CellCoord)
+					return FColor(255,255,0);
+			}
+		}	
 
 		// The cell is part of a branch, show a dark brown color
 		if (MapGraph.At(CellCoord).Connectors.Num() > 0)
-			return FColor(200, 180, 100);
+			return FColor(255, 180, 0, 255);
 			
 		return FColor::White;
 	}
@@ -168,7 +201,7 @@ void AMapGenerator::BeginPlay()
 
 void AMapGenerator::TeleportPlayerToStart()
 {
-	FMapGraphCoord StartCoord = CachedMapGraph.MainPathStart;	
+	FMapGraphCoord StartCoord = CachedMapGraph.GetMainPathStart();	
 	FVector StartLocation(-StartCoord.Row * TileSize, StartCoord.Column * TileSize, 150);
 
 	if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
