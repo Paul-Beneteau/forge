@@ -1,6 +1,6 @@
 # Forge - ARPG Prototype
 
-An Action RPG project built in Unreal Engine with C++, inspired by Path of Exile. It is composed of 4 systems that were developed independently and merged together.
+An Action RPG project built in Unreal Engine with C++, inspired by Path of Exile. It is composed of 4 core systems that were developed as separate projects and then integrated together.
 
 ## Core Systems
 
@@ -50,9 +50,9 @@ The damage calculation follows Path of Exile's model with flat, additive, and mu
 
 ## Technical Challenges & Architecture
 
-I focused on keeping the code simple and readable. I devoleped system as seperate projects so they could be independant which makes the architecture easier to understand and debug. Each system has data assets for configuration which makes it easy to customize it.
+I focused on keeping the code simple and readable. I devoleped system as seperate projects so they could be independant which makes the architecture easier to understand and debug. Each system has data assets for configuration making it easier to customize.
 
-I learned a lot about project architecture and some Unreal specific systems like GAS, behavior tree and EQS. The biggest challenge was the procedural map generation because graph layout generation can be complex and hard to debug. It can be hard to trace how some tiles are generated and where the bug comes from.
+I learned about project architecture and some Unreal specific systems like GAS, behavior tree and EQS. The biggest challenge was the procedural map generation, creating a nice graph layout is challenging and can be hard to debug, especially retracing the tile generation.
 
 ## Links
 
